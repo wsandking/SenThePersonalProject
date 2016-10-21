@@ -37,7 +37,7 @@ public class XMPPSessionManager {
 
 	}
 
-	public static boolean login(String username, String passwd) {
+	public boolean login(String username, String passwd) {
 		boolean result = false;
 		
 		
