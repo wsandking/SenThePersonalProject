@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.kandy.protocol.xmpp.model.RegisterRequest;
-import io.kandy.protocol.xmpp.model.RegisterResponse;
 import io.kandy.protocol.xmpp.service.XMPPSessionManager;
 
 @RestController
