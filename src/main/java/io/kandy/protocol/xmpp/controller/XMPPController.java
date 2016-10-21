@@ -1,23 +1,55 @@
 package io.kandy.protocol.xmpp.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.kandy.protocol.xmpp.model.RegisterRequest;
 import io.kandy.protocol.xmpp.model.RegisterResponse;
+import io.kandy.protocol.xmpp.service.XMPPSessionManager;
 
 @RestController
 @RequestMapping("/protocol/xmpp")
 public class XMPPController {
 
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public RegisterResponse greeting(@RequestBody RegisterRequest request) {
-		System.out.println("Username: " + request.getUsername());
-		System.out.println("Password: " + request.getPassword());
+	@Autowired
+	private XMPPSessionManager xmppSessionManager;
 
-		return new RegisterResponse(100, true);
+	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	public ResponseEntity<String> Login(@RequestBody RegisterRequest request) {
+
+		System.out.println(
+				String.format("Username: %s --------- Password: %s", request.getUsername(), request.getPassword()));
+		ResponseEntity<String> response;
+		try {
+			xmppSessionManager.login(request.getUsername(), request.getPassword());
+			response = new ResponseEntity<String>("Login Successful", HttpStatus.CREATED);
+		} catch (Exception e) {
+			response = new ResponseEntity<String>("Login Failure", HttpStatus.UNAUTHORIZED);
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+	@RequestMapping(value = "/register", method = RequestMethod.DELETE)
+	public ResponseEntity<String> Logout(@RequestParam String username) {
+
+		System.out.println(String.format("Username: %s about to logout", username));
+		ResponseEntity<String> response;
+
+		try {
+			xmppSessionManager.logout(username);
+			response = new ResponseEntity<String>("Logout Successful", HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			response = new ResponseEntity<String>("Logout Failure", HttpStatus.BAD_REQUEST);
+			e.printStackTrace();
+		}
+		return response;
 	}
 
 }
