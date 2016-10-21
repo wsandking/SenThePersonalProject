@@ -10,3 +10,4 @@ public class XMPPApplication {
 		SpringApplication.run(XMPPApplication.class, args);
 	}
 }
+
