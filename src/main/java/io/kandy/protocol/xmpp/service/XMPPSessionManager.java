@@ -61,7 +61,7 @@ public class XMPPSessionManager {
 		ProviderManager.addExtensionProvider(DeliveryReceiptRequest.ELEMENT,
 				new DeliveryReceiptRequest().getNamespace(), new DeliveryReceiptRequest.Provider());
 
-		DeliveryReceiptManager.setDefaultAutoReceiptMode(AutoReceiptMode.always);
+		DeliveryReceiptManager.setDefaultAutoReceiptMode(AutoReceiptMode.ifIsSubscribed);
 	}
 
 	@PreDestroy
