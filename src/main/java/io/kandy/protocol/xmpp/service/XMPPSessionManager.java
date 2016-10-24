@@ -13,7 +13,6 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
@@ -23,7 +22,7 @@ import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
-import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import io.kandy.protocol.xmpp.message.listener.GenericChatListener;
 import io.kandy.protocol.xmpp.message.listener.GenericChatManagerListner;
+import io.kandy.protocol.xmpp.message.listener.GenericDeliveryReceiptReceivedListener;
 
 /*
  * Shouldn't have put all logic here, should make a new class that is not singleton retrieve connection from here
@@ -57,6 +57,15 @@ public class XMPPSessionManager {
 
 	@Value("${xmpp.port}")
 	private int defaultPort;
+
+	@Value("${im.server.address}")
+	private String imhost;
+
+	@Value("${im.server.port}")
+	private int port;
+
+	@Value("${im.server.path}")
+	private String impath;
 
 	@Value("${xmpp.deliver.receipt.enable}")
 	private boolean defaultEnableMessageDeliverReceipt;
@@ -114,16 +123,12 @@ public class XMPPSessionManager {
 			 */
 			ChatManager chatManager = ChatManager.getInstanceFor(connection);
 			chatManager.addChatListener(new GenericChatManagerListner());
+			// chatManager.addChatListener(chatListenerManager);
 
-			// DeliveryReceiptManager.getInstanceFor(connection).autoAddDeliveryReceiptRequests();
-			DeliveryReceiptManager.getInstanceFor(connection).addReceiptReceivedListener(new ReceiptReceivedListener() {
-				@Override
-				public void onReceiptReceived(String fromJid, String toJid, String deliveryReceiptId, Stanza stanza) {
-					// TODO Auto-generated method stub
-					System.out.println("onReceiptReceived: from: " + fromJid + " to: " + toJid + " deliveryReceiptId: "
-							+ deliveryReceiptId + " stanza: " + stanza);
-				}
-			});
+			DeliveryReceiptManager.getInstanceFor(connection)
+					.addReceiptReceivedListener(new GenericDeliveryReceiptReceivedListener());
+
+			// DeliveryReceiptManager.getInstanceFor(connection).addReceiptReceivedListener(receiptListener);
 
 			/*
 			 * Make sure connection pool operation thread safe, maybe use
@@ -137,15 +142,15 @@ public class XMPPSessionManager {
 		return result;
 	}
 
-	public boolean SendPlainTextMessage(String username, String to, String msg) throws Exception {
-		boolean result = false;
+	public String SendPlainTextMessage(String username, String to, String msg) throws Exception {
+		String messageId = null;
 
 		/*
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
 		 */
 		if (XMPP_SESSION_POOL.containsKey(username)) {
-			result = true;
+
 			if (null != XMPP_SESSION_POOL.get(username) && XMPP_SESSION_POOL.get(username).isConnected()) {
 				AbstractXMPPConnection connection = XMPP_SESSION_POOL.get(username);
 				ChatManager chatmanager = ChatManager.getInstanceFor(connection);
@@ -161,6 +166,8 @@ public class XMPPSessionManager {
 					chat = CHAT_POOL.get(chatKey);
 				} else {
 					chat = chatmanager.createChat(to, new GenericChatListener());
+					// chat = chatmanager.createChat(to, chatListener);
+
 					synchronized (CHAT_POOL) {
 						CHAT_POOL.put(chatKey, chat);
 					}
@@ -168,27 +175,26 @@ public class XMPPSessionManager {
 				if (null != chat) {
 					Message message = new Message();
 					message.setBody(msg);
-					MessageDelivery(chat, message);
+					messageId = MessageDelivery(chat, message);
 				} else {
 					System.out.println("Message delivery failed");
 				}
 			}
 
 		} else {
-			result = false;
 			throw new Exception("Message deliver failure");
 		}
-		return result;
+
+		return messageId;
 	}
 
-	private boolean MessageDelivery(Chat chat, Message msg) throws NotConnectedException {
-		boolean result = false;
-		String deliveryReceiptId = DeliveryReceiptRequest.addTo(msg);
+	private String MessageDelivery(Chat chat, Message msg) throws NotConnectedException {
 
+		String deliveryReceiptId = DeliveryReceiptRequest.addTo(msg);
 		chat.sendMessage(msg);
 
 		System.out.println("sendMessage: deliveryReceiptId for this message is: " + deliveryReceiptId);
-		return result;
+		return deliveryReceiptId;
 
 	}
 
