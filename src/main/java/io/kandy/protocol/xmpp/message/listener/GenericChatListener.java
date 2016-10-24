@@ -5,8 +5,6 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 
 public class GenericChatListener implements ChatMessageListener {
-
-	
 	
 	@Override
 	public void processMessage(Chat chat, Message message) {

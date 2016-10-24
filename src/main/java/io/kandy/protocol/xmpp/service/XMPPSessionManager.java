@@ -13,14 +13,17 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Stanza;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration.Builder;
 import org.jivesoftware.smack.util.TLSUtils;
+import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
-
+import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import io.kandy.protocol.xmpp.message.listener.GenericChatListener;
 import io.kandy.protocol.xmpp.message.listener.GenericChatManagerListner;
-import io.kandy.protocol.xmpp.message.listener.GenericDeliveryReceiptReceivedListener;
 
 /*
  * Shouldn't have put all logic here, should make a new class that is not singleton retrieve connection from here
@@ -72,6 +74,12 @@ public class XMPPSessionManager {
 		 */
 		XMPP_SESSION_POOL = new HashMap<String, AbstractXMPPConnection>();
 		CHAT_POOL = new HashMap<String, Chat>();
+		ProviderManager.addExtensionProvider(DeliveryReceipt.ELEMENT, DeliveryReceipt.NAMESPACE,
+				new DeliveryReceipt.Provider());
+		ProviderManager.addExtensionProvider(DeliveryReceiptRequest.ELEMENT,
+				new DeliveryReceiptRequest().getNamespace(), new DeliveryReceiptRequest.Provider());
+
+		DeliveryReceiptManager.setDefaultAutoReceiptMode(AutoReceiptMode.always);
 	}
 
 	@PreDestroy
@@ -96,6 +104,7 @@ public class XMPPSessionManager {
 		if (XMPP_SESSION_POOL.containsKey(username)) {
 			result = true;
 		} else {
+
 			AbstractXMPPConnection connection = new XMPPTCPConnection(notSecureConnectionBuild(username, passwd));
 			connection.connect();
 			connection.login();
@@ -105,6 +114,16 @@ public class XMPPSessionManager {
 			 */
 			ChatManager chatManager = ChatManager.getInstanceFor(connection);
 			chatManager.addChatListener(new GenericChatManagerListner());
+
+			// DeliveryReceiptManager.getInstanceFor(connection).autoAddDeliveryReceiptRequests();
+			DeliveryReceiptManager.getInstanceFor(connection).addReceiptReceivedListener(new ReceiptReceivedListener() {
+				@Override
+				public void onReceiptReceived(String fromJid, String toJid, String deliveryReceiptId, Stanza stanza) {
+					// TODO Auto-generated method stub
+					System.out.println("onReceiptReceived: from: " + fromJid + " to: " + toJid + " deliveryReceiptId: "
+							+ deliveryReceiptId + " stanza: " + stanza);
+				}
+			});
 
 			/*
 			 * Make sure connection pool operation thread safe, maybe use
@@ -135,9 +154,6 @@ public class XMPPSessionManager {
 				/*
 				 * Enable message receipt
 				 */
-				DeliveryReceiptManager dm = DeliveryReceiptManager.getInstanceFor(connection);
-				dm.addReceiptReceivedListener(new GenericDeliveryReceiptReceivedListener());
-				dm.setAutoReceiptMode(AutoReceiptMode.always);
 
 				Chat chat;
 				if (CHAT_POOL.containsKey(chatKey)) {
@@ -167,8 +183,11 @@ public class XMPPSessionManager {
 
 	private boolean MessageDelivery(Chat chat, Message msg) throws NotConnectedException {
 		boolean result = false;
-		DeliveryReceiptRequest.addTo(msg);
+		String deliveryReceiptId = DeliveryReceiptRequest.addTo(msg);
+
 		chat.sendMessage(msg);
+
+		System.out.println("sendMessage: deliveryReceiptId for this message is: " + deliveryReceiptId);
 		return result;
 
 	}

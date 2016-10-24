@@ -56,7 +56,7 @@ public class XMPPController {
 	public ResponseEntity<String> SendMessage(@RequestBody IMMessage im) {
 
 		System.out.println(
-				String.format("Message deliver from %s to %s :\n %s ", im.getFrom(), im.getTo(), im.getPlainMessage()));
+				String.format("Message send from %s to %s :\n %s ", im.getFrom(), im.getTo(), im.getPlainMessage()));
 		ResponseEntity<String> response;
 
 		try {
