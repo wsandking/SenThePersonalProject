@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Implementation-Title: io.kandy.protocol.xmpp
 Implementation-Version: 0.0.1-SNAPSHOT
-Built-By: Sen
+Built-By: sewang
 Implementation-Vendor-Id: io.kandy.protocol
-Build-Jdk: 1.8.0_65
+Build-Jdk: 1.8.0_101
 Implementation-URL: http://projects.spring.io/spring-boot/io.kandy.pro
  tocol.xmpp/
 Created-By: Maven Integration for Eclipse

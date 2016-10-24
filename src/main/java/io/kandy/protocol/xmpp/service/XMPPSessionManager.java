@@ -22,58 +22,31 @@ import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.stereotype.Service;
-
-import io.kandy.protocol.xmpp.message.listener.GenericChatListener;
-import io.kandy.protocol.xmpp.message.listener.GenericChatManagerListner;
-import io.kandy.protocol.xmpp.message.listener.GenericDeliveryReceiptReceivedListener;
+import io.kandy.protocol.xmpp.message.listener.SmackListener;
 
 /*
  * Shouldn't have put all logic here, should make a new class that is not singleton retrieve connection from here
  * */
 @Service
-@Configuration
 @Scope("singleton")
 public class XMPPSessionManager {
 
-	private volatile static Map<String, AbstractXMPPConnection> XMPP_SESSION_POOL;
+	private volatile Map<String, AbstractXMPPConnection> xmppSessionPool;
 
 	/*
 	 * Do we need to close if chat is not ongoing for while
 	 */
-	private volatile static Map<String, Chat> CHAT_POOL;
+	private volatile Map<String, Chat> chatPool;
 
-	@Value("${xmpp.service}")
-	private String defaultHostIp;
+	@Autowired
+	private ConfigurationService configurationService;
 
-	@Value("${xmpp.server}")
-	private String defaultService;
-
-	@Value("${xmpp.port}")
-	private int defaultPort;
-
-	@Value("${im.server.address}")
-	private String imhost;
-
-	@Value("${im.server.port}")
-	private int port;
-
-	@Value("${im.server.path}")
-	private String impath;
-
-	@Value("${xmpp.deliver.receipt.enable}")
-	private boolean defaultEnableMessageDeliverReceipt;
-
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
+	@Autowired
+	private SmackListener listener;
 
 	@PostConstruct
 	public void initIn() {
@@ -81,8 +54,8 @@ public class XMPPSessionManager {
 		 * Initialize the connection pool, at this point, initial XMPP
 		 * Connection
 		 */
-		XMPP_SESSION_POOL = new HashMap<String, AbstractXMPPConnection>();
-		CHAT_POOL = new HashMap<String, Chat>();
+		xmppSessionPool = new HashMap<String, AbstractXMPPConnection>();
+		chatPool = new HashMap<String, Chat>();
 		ProviderManager.addExtensionProvider(DeliveryReceipt.ELEMENT, DeliveryReceipt.NAMESPACE,
 				new DeliveryReceipt.Provider());
 		ProviderManager.addExtensionProvider(DeliveryReceiptRequest.ELEMENT,
@@ -96,8 +69,8 @@ public class XMPPSessionManager {
 		/*
 		 * Make sure all the connection inside has been closed properly
 		 */
-		for (String connectionName : XMPP_SESSION_POOL.keySet()) {
-			AbstractXMPPConnection connection = XMPP_SESSION_POOL.get(connectionName);
+		for (String connectionName : xmppSessionPool.keySet()) {
+			AbstractXMPPConnection connection = xmppSessionPool.get(connectionName);
 			connection.disconnect();
 		}
 
@@ -110,7 +83,7 @@ public class XMPPSessionManager {
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
 		 */
-		if (XMPP_SESSION_POOL.containsKey(username)) {
+		if (xmppSessionPool.containsKey(username)) {
 			result = true;
 		} else {
 
@@ -122,20 +95,21 @@ public class XMPPSessionManager {
 			 * Add a chat listener here see if there is incoming message.
 			 */
 			ChatManager chatManager = ChatManager.getInstanceFor(connection);
-			chatManager.addChatListener(new GenericChatManagerListner());
-			// chatManager.addChatListener(chatListenerManager);
+			chatManager.addChatListener(listener.getChatManagerListener());
+
+			// chatManager.addChatListener(new GenericChatManagerListner());
+			// chatManager.addChatListener(beanFactory.getBean(GenericChatManagerListner.class));
+			// chatManager.addChatListener(config.getChatManagerListener());
 
 			DeliveryReceiptManager.getInstanceFor(connection)
-					.addReceiptReceivedListener(new GenericDeliveryReceiptReceivedListener());
-
-			// DeliveryReceiptManager.getInstanceFor(connection).addReceiptReceivedListener(receiptListener);
+					.addReceiptReceivedListener(listener.getDeliveryReceiptReceivedListener());
 
 			/*
 			 * Make sure connection pool operation thread safe, maybe use
 			 * hashtable directly could be good
 			 */
-			synchronized (XMPP_SESSION_POOL) {
-				XMPP_SESSION_POOL.put(username, connection);
+			synchronized (xmppSessionPool) {
+				xmppSessionPool.put(username, connection);
 			}
 			result = true;
 		}
@@ -149,10 +123,10 @@ public class XMPPSessionManager {
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
 		 */
-		if (XMPP_SESSION_POOL.containsKey(username)) {
+		if (xmppSessionPool.containsKey(username)) {
 
-			if (null != XMPP_SESSION_POOL.get(username) && XMPP_SESSION_POOL.get(username).isConnected()) {
-				AbstractXMPPConnection connection = XMPP_SESSION_POOL.get(username);
+			if (null != xmppSessionPool.get(username) && xmppSessionPool.get(username).isConnected()) {
+				AbstractXMPPConnection connection = xmppSessionPool.get(username);
 				ChatManager chatmanager = ChatManager.getInstanceFor(connection);
 				String chatKey = getChatKey(username, to);
 
@@ -161,15 +135,14 @@ public class XMPPSessionManager {
 				 */
 
 				Chat chat;
-				if (CHAT_POOL.containsKey(chatKey)) {
+				if (chatPool.containsKey(chatKey)) {
 					System.out.println("Find a reusable chat");
-					chat = CHAT_POOL.get(chatKey);
+					chat = chatPool.get(chatKey);
 				} else {
-					chat = chatmanager.createChat(to, new GenericChatListener());
+					chat = chatmanager.createChat(to, listener.getChatListener());
 					// chat = chatmanager.createChat(to, chatListener);
-
-					synchronized (CHAT_POOL) {
-						CHAT_POOL.put(chatKey, chat);
+					synchronized (chatPool) {
+						chatPool.put(chatKey, chat);
 					}
 				}
 				if (null != chat) {
@@ -213,12 +186,12 @@ public class XMPPSessionManager {
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
 		 */
-		if (XMPP_SESSION_POOL.containsKey(username)) {
+		if (xmppSessionPool.containsKey(username)) {
 			result = true;
-			synchronized (XMPP_SESSION_POOL) {
-				if (null != XMPP_SESSION_POOL.get(username) && XMPP_SESSION_POOL.get(username).isConnected())
-					XMPP_SESSION_POOL.get(username).disconnect();
-				XMPP_SESSION_POOL.remove(username);
+			synchronized (xmppSessionPool) {
+				if (null != xmppSessionPool.get(username) && xmppSessionPool.get(username).isConnected())
+					xmppSessionPool.get(username).disconnect();
+				xmppSessionPool.remove(username);
 			}
 		} else {
 			result = true;
@@ -230,16 +203,21 @@ public class XMPPSessionManager {
 	private XMPPTCPConnectionConfiguration notSecureConnectionBuild(String username, String password)
 			throws KeyManagementException, NoSuchAlgorithmException {
 
-		System.out.println(String.format("Host: %s : port: %d", defaultHostIp, defaultPort));
+		// System.out.println(String.format("Host: %s : port: %d",
+		// defaultHostIp, defaultPort));
+		System.out.println(String.format("Host: %s : port: %d", configurationService.getDefaultHostIp(),
+				configurationService.getPort()));
 
 		Builder builder;
 		builder = XMPPTCPConnectionConfiguration.builder();
-		builder.setUsernameAndPassword(username, password).setServiceName(defaultService).setHost(defaultHostIp)
-				.setPort(defaultPort).build();
+		builder.setUsernameAndPassword(username, password).setServiceName(configurationService.getDefaultService())
+				.setHost(configurationService.getDefaultHostIp()).setPort(configurationService.getDefaultPort())
+				.build();
 
 		TLSUtils.disableHostnameVerificationForTlsCertificicates(builder);
 		TLSUtils.acceptAllCertificates(builder);
 
 		return builder.build();
 	}
+
 }

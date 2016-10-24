@@ -102,7 +102,7 @@ public class XMPPController {
 				String.format("Message send from %s to %s :\n %s ", im.getFrom(), im.getTo(), im.getPlainMessage()));
 		IMMessageReceivedResponse res = new IMMessageReceivedResponse();
 		res.setMessage(
-				String.format("%s will receive message %s from %s", im.getTo(), im.getPlainMessage(), im.getTo()));
+				String.format("%s will receive message \"%s\" from %s", im.getTo(), im.getPlainMessage(), im.getTo()));
 		res.setStatusCode(0);
 		ResponseEntity<IMMessageReceivedResponse> response = new ResponseEntity<IMMessageReceivedResponse>(res,
 				HttpStatus.CREATED);
