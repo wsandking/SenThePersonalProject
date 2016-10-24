@@ -1,44 +1,44 @@
 package io.kandy.protocol.xmpp.model;
 
 public class IMMessage {
-	private String from;
-	private String to;
-	private String plainMessage;
-
-	public IMMessage(String from, String to, String plainMessage) {
-		super();
-		this.from = from;
-		this.to = to;
-		this.plainMessage = plainMessage;
-	}
+	private String charset;
+	private String toUrl;
+	private String Message;
 
 	public IMMessage() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public String getFrom() {
-		return from;
+	public IMMessage(String toUrl, String message) {
+		super();
+		this.toUrl = toUrl;
+		this.Message = message;
+		this.charset = "UTF-8";
 	}
 
-	public void setFrom(String from) {
-		this.from = from;
+	public String getCharset() {
+		return charset;
 	}
 
-	public String getTo() {
-		return to;
+	public void setCharset(String charset) {
+		this.charset = charset;
 	}
 
-	public void setTo(String to) {
-		this.to = to;
+	public String getToUrl() {
+		return toUrl;
 	}
 
-	public String getPlainMessage() {
-		return plainMessage;
+	public void setToUrl(String toUrl) {
+		this.toUrl = toUrl;
 	}
 
-	public void setPlainMessage(String plainMessage) {
-		this.plainMessage = plainMessage;
+	public String getMessage() {
+		return Message;
+	}
+
+	public void setMessage(String message) {
+		Message = message;
 	}
 
 }

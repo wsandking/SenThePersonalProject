@@ -31,10 +31,10 @@ public class GenericChatListener implements ChatMessageListener {
 		System.out.println("Message type: " + message.getType());
 		System.out.println("Message received: " + message);
 
-		IMMessage msg = new IMMessage(message.getFrom(), message.getTo(), message.getBody());
+ 
 		try {
 			// client = new IMMessageClient();
-			IMMessageReceivedResponse response = client.messageReceived(msg);
+			IMMessageReceivedResponse response = client.messageReceived(message);
 			System.out.println("Message forwarded result : " + response.getMessage());
 
 			/*
