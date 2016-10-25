@@ -14,6 +14,7 @@ import io.kandy.protocol.xmpp.model.IMMessageDeliveredAck;
 import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 import io.kandy.protocol.xmpp.model.RegisterRequest;
+import io.kandy.protocol.xmpp.model.RegisterResponse;
 import io.kandy.protocol.xmpp.service.XMPPSessionManager;
 
 @RestController
@@ -24,17 +25,20 @@ public class XMPPController {
 	private XMPPSessionManager xmppSessionManager;
 
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public ResponseEntity<String> Login(@PathVariable("xmppid") String xmppid, @RequestBody RegisterRequest request) {
+	public ResponseEntity<RegisterResponse> Login(@PathVariable("xmppid") String xmppid,
+			@RequestBody RegisterRequest request) {
 
-		System.out.println(
-				String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
+		System.out.println(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
 
-		ResponseEntity<String> response;
+		ResponseEntity<RegisterResponse> response;
 		try {
-			xmppSessionManager.login(request.getXmppid(), request.getPassword());
-			response = new ResponseEntity<String>("Login Successful", HttpStatus.CREATED);
+			String streamId = xmppSessionManager.login(request.getXmppid(), request.getPassword());
+			RegisterResponse responseBody = new RegisterResponse(xmppid, streamId);
+
+			response = new ResponseEntity<RegisterResponse>(responseBody, HttpStatus.CREATED);
 		} catch (Exception e) {
-			response = new ResponseEntity<String>("Login Failure", HttpStatus.UNAUTHORIZED);
+			RegisterResponse responseBody = null;
+			response = new ResponseEntity<RegisterResponse>(responseBody, HttpStatus.UNAUTHORIZED);
 			e.printStackTrace();
 		}
 

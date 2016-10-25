@@ -34,9 +34,15 @@ public class IMMessageClient {
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML));
 		HttpEntity<IMMessage> entity = new HttpEntity<IMMessage>(im, headers);
 
+		/*
+		 * senwangtest1@127.0.0.1/Spark
+		 */
+		String[] messageSender = message.getFrom().split("/");
+		String sender = messageSender[0];
+
 		String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
 				configurationService.getPort(), configurationService.getImpath(),
-				message.getFrom() + "/protocol/xmpp/message/received");
+				sender + "/protocol/xmpp/message/received");
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageReceivedResponse> response = client.postForEntity(url, entity,
 				IMMessageReceivedResponse.class);

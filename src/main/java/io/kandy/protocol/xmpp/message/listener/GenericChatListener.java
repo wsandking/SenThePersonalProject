@@ -6,7 +6,6 @@ import org.jivesoftware.smack.packet.Message;
 
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 
-import io.kandy.protocol.xmpp.model.IMMessage;
 import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
@@ -31,25 +30,35 @@ public class GenericChatListener implements ChatMessageListener {
 		System.out.println("Message type: " + message.getType());
 		System.out.println("Message received: " + message);
 
- 
 		try {
 			// client = new IMMessageClient();
-			IMMessageReceivedResponse response = client.messageReceived(message);
-			System.out.println("Message forwarded result : " + response.getMessage());
+			if (null != message.getBody()) {
+				IMMessageReceivedResponse response = client.messageReceived(message);
+				System.out.println("Message forwarded result : " + response.getMessage());
 
-			/*
-			 * Message receipt information
-			 */
-			if (DeliveryReceiptManager.hasDeliveryReceiptRequest(message)) {
-				Message receipt = DeliveryReceiptManager.receiptMessageFor(message);
-				if (null != receipt) {
-					System.out.println("Message receipt payload: " + receipt);
-					chat.sendMessage(receipt);
+				/*
+				 * Message receipt information
+				 */
+				if (DeliveryReceiptManager.hasDeliveryReceiptRequest(message)) {
+					Message receipt = DeliveryReceiptManager.receiptMessageFor(message);
+					if (null != receipt) {
+						System.out.println("Message receipt payload: " + receipt);
+						chat.sendMessage(receipt);
+					} else {
+						System.out.println("Message generation failure: ");
+					}
 				} else {
-					System.out.println("Message generation failure: ");
+					System.out.println("Message do not require actions.");
 				}
 			} else {
-				System.out.println("Message do not require actions.");
+				/*
+				 * Todo:
+				 * 
+				 * Create websocket or other lightweight message components
+				 * 
+				 */
+				System.out.println("Not a message, a presense message");
+
 			}
 		} catch (Exception e) {
 			System.out.println("Northbound message delivery failed");

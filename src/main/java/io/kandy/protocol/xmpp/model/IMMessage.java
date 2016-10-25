@@ -3,17 +3,24 @@ package io.kandy.protocol.xmpp.model;
 public class IMMessage {
 	private String charset;
 	private String toUrl;
-	private String Message;
+	private String message;
 
 	public IMMessage() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
+	public IMMessage(String charset, String toUrl, String message) {
+		super();
+		this.charset = charset;
+		this.toUrl = toUrl;
+		this.message = message;
+	}
+
 	public IMMessage(String toUrl, String message) {
 		super();
 		this.toUrl = toUrl;
-		this.Message = message;
+		this.message = message;
 		this.charset = "UTF-8";
 	}
 
@@ -34,11 +41,11 @@ public class IMMessage {
 	}
 
 	public String getMessage() {
-		return Message;
+		return message;
 	}
 
 	public void setMessage(String message) {
-		Message = message;
+		this.message = message;
 	}
 
 }

@@ -76,15 +76,15 @@ public class XMPPSessionManager {
 
 	}
 
-	public boolean login(String username, String passwd) throws Exception {
-		boolean result = false;
+	public String login(String username, String passwd) throws Exception {
+		String streamId = null;
 
 		/*
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
 		 */
 		if (xmppSessionPool.containsKey(username)) {
-			result = true;
+			streamId = xmppSessionPool.get(username).getStreamId();
 		} else {
 
 			AbstractXMPPConnection connection = new XMPPTCPConnection(notSecureConnectionBuild(username, passwd));
@@ -111,9 +111,9 @@ public class XMPPSessionManager {
 			synchronized (xmppSessionPool) {
 				xmppSessionPool.put(username, connection);
 			}
-			result = true;
+			streamId = connection.getStreamId();
 		}
-		return result;
+		return streamId;
 	}
 
 	public String SendPlainTextMessage(String username, String to, String msg) throws Exception {
