@@ -2,15 +2,15 @@ package io.kandy.protocol.xmpp.model;
 
 public class RegisterRequest {
 
-	private String xmppid;
+	private String xmppId;
 	private String password;
 
-	public String getXmppid() {
-		return xmppid;
+	public String getXmppId() {
+		return xmppId;
 	}
 
-	public void setXmppid(String xmppid) {
-		this.xmppid = xmppid;
+	public void setXmppId(String xmppId) {
+		this.xmppId = xmppId;
 	}
 
 	public String getPassword() {

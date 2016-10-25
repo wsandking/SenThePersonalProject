@@ -1,7 +1,8 @@
 package io.kandy.protocol.xmpp.model;
 
 public class RegisterResponse {
-	private String xmppid;
+	private int statusCode;
+	private String xmppId;
 	private String streamId;
 
 	public RegisterResponse() {
@@ -11,16 +12,8 @@ public class RegisterResponse {
 
 	public RegisterResponse(String xmppid, String streamId) {
 		super();
-		this.xmppid = xmppid;
+		this.setXmppId(xmppid);
 		this.streamId = streamId;
-	}
-
-	public String getXmppid() {
-		return xmppid;
-	}
-
-	public void setXmppid(String xmppid) {
-		this.xmppid = xmppid;
 	}
 
 	public String getStreamId() {
@@ -29,6 +22,22 @@ public class RegisterResponse {
 
 	public void setStreamId(String streamId) {
 		this.streamId = streamId;
+	}
+
+	public int getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	public String getXmppId() {
+		return xmppId;
+	}
+
+	public void setXmppId(String xmppId) {
+		this.xmppId = xmppId;
 	}
 
 }

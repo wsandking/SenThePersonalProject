@@ -1,5 +1,7 @@
 package io.kandy.protocol.xmpp.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import io.kandy.protocol.xmpp.service.XMPPSessionManager;
 @RequestMapping("/rest/version/1/user/{xmppid}/protocol/xmpp/")
 public class XMPPController {
 
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	@Autowired
 	private XMPPSessionManager xmppSessionManager;
 
@@ -28,11 +32,12 @@ public class XMPPController {
 	public ResponseEntity<RegisterResponse> Login(@PathVariable("xmppid") String xmppid,
 			@RequestBody RegisterRequest request) {
 
+		logger.info(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
 		System.out.println(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
 
 		ResponseEntity<RegisterResponse> response;
 		try {
-			String streamId = xmppSessionManager.login(request.getXmppid(), request.getPassword());
+			String streamId = xmppSessionManager.login(request.getXmppId(), request.getPassword());
 			RegisterResponse responseBody = new RegisterResponse(xmppid, streamId);
 
 			response = new ResponseEntity<RegisterResponse>(responseBody, HttpStatus.CREATED);
@@ -47,13 +52,13 @@ public class XMPPController {
 
 	@RequestMapping(value = "/register", method = RequestMethod.DELETE)
 	public ResponseEntity<String> Logout(@PathVariable("xmppid") String username) {
-
+		logger.info(String.format("Username: %s about to logout", username));
 		System.out.println(String.format("Username: %s about to logout", username));
 		ResponseEntity<String> response;
 
 		try {
 			xmppSessionManager.logout(username);
-			response = new ResponseEntity<String>("Logout Successful", HttpStatus.ACCEPTED);
+			response = new ResponseEntity<String>("Logout Successful", HttpStatus.OK);
 		} catch (Exception e) {
 			response = new ResponseEntity<String>("Logout Failure", HttpStatus.BAD_REQUEST);
 			e.printStackTrace();
@@ -64,6 +69,8 @@ public class XMPPController {
 	@RequestMapping(value = "/message", method = RequestMethod.POST)
 	public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
 			@RequestBody IMMessage im) {
+
+		logger.info(String.format("Message send from %s to %s :\n %s ", username, im.getToUrl(), im.getMessage()));
 
 		System.out
 				.println(String.format("Message send from %s to %s :\n %s ", username, im.getToUrl(), im.getMessage()));
