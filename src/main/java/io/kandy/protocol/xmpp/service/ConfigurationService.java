@@ -13,6 +13,9 @@ public class ConfigurationService {
 	@Value("${xmpp.server}")
 	private String defaultService;
 
+	@Value("${xmpp.domain}")
+	private String xmppDomain;
+
 	@Value("${xmpp.port}")
 	private int defaultPort;
 
@@ -27,6 +30,17 @@ public class ConfigurationService {
 
 	@Value("${im.server.path}")
 	private String impath;
+
+	@Value("${im.server.domain.name}")
+	private String domainName;
+
+	public String getDomainName() {
+		return domainName;
+	}
+
+	public void setDomainName(String domainName) {
+		this.domainName = domainName;
+	}
 
 	public String getDefaultHostIp() {
 		return defaultHostIp;
@@ -58,6 +72,14 @@ public class ConfigurationService {
 
 	public void setDefaultEnableMessageDeliverReceipt(boolean defaultEnableMessageDeliverReceipt) {
 		this.defaultEnableMessageDeliverReceipt = defaultEnableMessageDeliverReceipt;
+	}
+
+	public String getXmppDomain() {
+		return xmppDomain;
+	}
+
+	public void setXmppDomain(String xmppDomain) {
+		this.xmppDomain = xmppDomain;
 	}
 
 	public String getImhost() {

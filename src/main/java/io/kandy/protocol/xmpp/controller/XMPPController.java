@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.kandy.protocol.xmpp.model.IMMessage;
-import io.kandy.protocol.xmpp.model.IMMessageDeliveredAck;
 import io.kandy.protocol.xmpp.model.IMMessageReceipt;
-import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 import io.kandy.protocol.xmpp.model.RegisterRequest;
 import io.kandy.protocol.xmpp.model.RegisterResponse;
 import io.kandy.protocol.xmpp.service.XMPPSessionManager;
@@ -70,15 +68,17 @@ public class XMPPController {
 	public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
 			@RequestBody IMMessage im) {
 
-		logger.info(String.format("Message send from %s to %s :\n %s ", username, im.getToUrl(), im.getMessage()));
+		logger.info(String.format("Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
+				im.getImRequest().getMessage()));
 
-		System.out
-				.println(String.format("Message send from %s to %s :\n %s ", username, im.getToUrl(), im.getMessage()));
+		System.out.println(String.format("Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
+				im.getImRequest().getMessage()));
 		ResponseEntity<IMMessageReceipt> response;
 		IMMessageReceipt receipt = new IMMessageReceipt();
 
 		try {
-			String messageId = xmppSessionManager.SendPlainTextMessage(username, im.getToUrl(), im.getMessage());
+			String messageId = xmppSessionManager.SendPlainTextMessage(username, im.getImRequest().getToUrl(),
+					im.getImRequest().getMessage());
 
 			receipt.setMessageId(messageId);
 			receipt.setStatusCode(0);
@@ -92,36 +92,6 @@ public class XMPPController {
 			response = new ResponseEntity<IMMessageReceipt>(receipt, HttpStatus.UNAUTHORIZED);
 			e.printStackTrace();
 		}
-		return response;
-	}
-
-	@RequestMapping(value = "/message/test", method = RequestMethod.POST)
-	public ResponseEntity<IMMessageDeliveredAck> testPostChannel(@RequestBody IMMessageReceipt ir) {
-
-		System.out.println(String.format("Message delivered for message id %s", ir.getMessageId()));
-		IMMessageDeliveredAck res = new IMMessageDeliveredAck();
-		res.setMessageId(ir.getMessageId());
-		res.setStatusCode(0);
-		ResponseEntity<IMMessageDeliveredAck> response = new ResponseEntity<IMMessageDeliveredAck>(res,
-				HttpStatus.CREATED);
-
-		return response;
-
-	}
-
-	@RequestMapping(value = "/message/received", method = RequestMethod.POST)
-	public ResponseEntity<IMMessageReceivedResponse> testPostReceivedChannel(@PathVariable("xmppid") String username,
-			@RequestBody IMMessage im) {
-
-		System.out
-				.println(String.format("Message send from %s to %s :\n %s ", username, im.getToUrl(), im.getMessage()));
-		IMMessageReceivedResponse res = new IMMessageReceivedResponse();
-		res.setMessage(
-				String.format("%s will receive message \"%s\" from %s", username, im.getToUrl(), im.getMessage()));
-		res.setStatusCode(0);
-		ResponseEntity<IMMessageReceivedResponse> response = new ResponseEntity<IMMessageReceivedResponse>(res,
-				HttpStatus.CREATED);
-
 		return response;
 	}
 

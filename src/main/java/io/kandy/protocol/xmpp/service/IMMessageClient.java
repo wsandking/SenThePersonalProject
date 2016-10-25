@@ -27,7 +27,9 @@ public class IMMessageClient {
 	public IMMessageReceivedResponse messageReceived(Message message) {
 		RestTemplate client = new RestTemplate();
 
-		IMMessage im = new IMMessage(message.getTo(), message.getBody());
+		String receiver = this.makeUsername(message.getTo());
+
+		IMMessage im = new IMMessage(receiver, message.getBody());
 
 		IMMessageReceivedResponse ack = null;
 		HttpHeaders headers = new HttpHeaders();
@@ -37,12 +39,12 @@ public class IMMessageClient {
 		/*
 		 * senwangtest1@127.0.0.1/Spark
 		 */
-		String[] messageSender = message.getFrom().split("/");
-		String sender = messageSender[0];
+
+		String sender = this.makeUsername(message.getFrom());
 
 		String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
 				configurationService.getPort(), configurationService.getImpath(),
-				sender + "/protocol/xmpp/message/received");
+				sender + "/app/xmpp/im/receive");
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageReceivedResponse> response = client.postForEntity(url, entity,
 				IMMessageReceivedResponse.class);
@@ -60,7 +62,7 @@ public class IMMessageClient {
 		HttpEntity<IMMessageReceipt> entity = new HttpEntity<IMMessageReceipt>(message, headers);
 
 		String url = String.format("http://%s:%d/%s%s", configurationService.getImhost(),
-				configurationService.getPort(), configurationService.getImpath(), "/message/test");
+				configurationService.getPort(), configurationService.getImpath(), "/app/xmpp/im/deliver");
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageDeliveredAck> response = client.postForEntity(url, entity, IMMessageDeliveredAck.class);
 
@@ -69,4 +71,19 @@ public class IMMessageClient {
 
 	}
 
+	private String makeUsername(String username) {
+
+		if (username.contains("/")) {
+			String[] parts = username.split("/");
+			username = parts[0];
+
+		}
+
+		if (username.contains("@")) {
+			String[] anotherparts = username.split("@");
+			username = anotherparts[0] + "@" + configurationService.getDomainName();
+		}
+
+		return username;
+	}
 }

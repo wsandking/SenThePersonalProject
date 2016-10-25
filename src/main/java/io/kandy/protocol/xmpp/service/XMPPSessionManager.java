@@ -79,6 +79,7 @@ public class XMPPSessionManager {
 	public String login(String username, String passwd) throws Exception {
 		String streamId = null;
 
+		username = this.retriveUsername(username);
 		/*
 		 * Check if user has already logged in and have a connection, create one
 		 * otherwise.
@@ -118,6 +119,8 @@ public class XMPPSessionManager {
 
 	public String SendPlainTextMessage(String username, String to, String msg) throws Exception {
 		String messageId = null;
+		username = this.retriveUsername(username);
+		to = this.makeToUrl(to);
 
 		/*
 		 * Check if user has already logged in and have a connection, create one
@@ -148,6 +151,8 @@ public class XMPPSessionManager {
 				if (null != chat) {
 					Message message = new Message();
 					message.setBody(msg);
+					message.setFrom(username);
+					message.setTo(to);
 					messageId = MessageDelivery(chat, message);
 				} else {
 					System.out.println("Message delivery failed");
@@ -181,6 +186,7 @@ public class XMPPSessionManager {
 
 	public boolean logout(String username) throws Exception {
 		boolean result = false;
+		username = this.retriveUsername(username);
 
 		/*
 		 * Check if user has already logged in and have a connection, create one
@@ -218,6 +224,28 @@ public class XMPPSessionManager {
 		TLSUtils.acceptAllCertificates(builder);
 
 		return builder.build();
+	}
+
+	private String retriveUsername(String xmppId) {
+
+		if (xmppId.contains("@")) {
+			String[] parts = xmppId.split("@");
+			xmppId = parts[0];
+
+		}
+		return xmppId;
+
+	}
+
+	private String makeToUrl(String to) {
+
+		if (to.contains("@")) {
+			String[] anotherparts = to.split("@");
+			to = anotherparts[0] + "@" + configurationService.getXmppDomain();
+		}
+
+		System.out.println("ToURL: " + to);
+		return to;
 	}
 
 }
