@@ -31,7 +31,6 @@ public class XMPPController {
 			@RequestBody RegisterRequest request) {
 
 		logger.info(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
-		System.out.println(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
 
 		ResponseEntity<RegisterResponse> response;
 		try {

@@ -3,12 +3,13 @@ package io.kandy.protocol.xmpp.app.properties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource("classpath:xmpp.properties")
+@PropertySources({ @PropertySource("classpath:xmpp.properties"),
+		@PropertySource(value = "file:${external.config}", ignoreResourceNotFound = true) })
 public class XMPPServiceProperties {
-
 
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {

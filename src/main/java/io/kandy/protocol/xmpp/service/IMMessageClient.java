@@ -43,8 +43,7 @@ public class IMMessageClient {
 		String sender = this.makeUsername(message.getFrom());
 
 		String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
-				configurationService.getPort(), configurationService.getImpath(),
-				sender + "/app/xmpp/im/receive");
+				configurationService.getPort(), configurationService.getImpath(), sender + "/app/xmpp/im/receive");
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageReceivedResponse> response = client.postForEntity(url, entity,
 				IMMessageReceivedResponse.class);
@@ -61,8 +60,11 @@ public class IMMessageClient {
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML));
 		HttpEntity<IMMessageReceipt> entity = new HttpEntity<IMMessageReceipt>(message, headers);
 
-		String url = String.format("http://%s:%d/%s%s", configurationService.getImhost(),
-				configurationService.getPort(), configurationService.getImpath(), "/app/xmpp/im/deliver");
+		/*
+		 * Waiting for message delivered API finished
+		 */
+		String url = String.format("http://%s:%d/%s%s", "127.0.0.1", configurationService.getPort(),
+				configurationService.getImpath(), "/app/xmpp/im/deliver");
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageDeliveredAck> response = client.postForEntity(url, entity, IMMessageDeliveredAck.class);
 

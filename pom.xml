@@ -89,6 +89,11 @@
 			<artifactId>smack-extensions</artifactId>
 			<version>4.1.0</version>
 		</dependency>
+		<!-- Hazelcast -->
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast</artifactId>
+		</dependency>
 	</dependencies>
 
 	<repositories>

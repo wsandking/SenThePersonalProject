@@ -21,6 +21,8 @@ import org.jivesoftware.smack.util.TLSUtils;
 import org.jivesoftware.smackx.receipts.DeliveryReceipt;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,6 +36,8 @@ import io.kandy.protocol.xmpp.message.listener.SmackListener;
 @Service
 @Scope("singleton")
 public class XMPPSessionManager {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private volatile Map<String, AbstractXMPPConnection> xmppSessionPool;
 
@@ -62,6 +66,7 @@ public class XMPPSessionManager {
 				new DeliveryReceiptRequest().getNamespace(), new DeliveryReceiptRequest.Provider());
 
 		DeliveryReceiptManager.setDefaultAutoReceiptMode(AutoReceiptMode.ifIsSubscribed);
+		logger.info("XMPPSessionManager initialization finished.");
 	}
 
 	@PreDestroy
