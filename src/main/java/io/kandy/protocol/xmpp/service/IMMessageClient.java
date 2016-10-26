@@ -44,6 +44,15 @@ public class IMMessageClient {
 
 		String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
 				configurationService.getPort(), configurationService.getImpath(), sender + "/app/xmpp/im/receive");
+
+		/*
+		 * Comment it out for now
+		 */
+		// String url = String.format("http://%s:%d/%s/%s",
+		// configurationService.getImhost(),
+		// configurationService.getPort(), configurationService.getImpath(),
+		// sender + "/app/xmpp/im/send");
+
 		System.out.println("Message forwarded to service url: " + url);
 		ResponseEntity<IMMessageReceivedResponse> response = client.postForEntity(url, entity,
 				IMMessageReceivedResponse.class);
