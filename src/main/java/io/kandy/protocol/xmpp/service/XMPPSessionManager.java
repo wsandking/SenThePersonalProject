@@ -3,7 +3,9 @@ package io.kandy.protocol.xmpp.service;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -71,13 +73,22 @@ public class XMPPSessionManager {
 
 	@PreDestroy
 	public void cleanUp() throws Exception {
+
+		for (String chatKey : chatPool.keySet()) {
+			Chat chat = chatPool.get(chatKey);
+			chat.close();
+		}
+		chatPool.clear();
+
 		/*
 		 * Make sure all the connection inside has been closed properly
 		 */
 		for (String connectionName : xmppSessionPool.keySet()) {
 			AbstractXMPPConnection connection = xmppSessionPool.get(connectionName);
 			connection.disconnect();
+			xmppSessionPool.remove(connection);
 		}
+		xmppSessionPool.clear();
 
 	}
 
@@ -141,26 +152,45 @@ public class XMPPSessionManager {
 				/*
 				 * Enable message receipt
 				 */
+				Chat chat = null;
+				try {
 
-				Chat chat;
-				if (chatPool.containsKey(chatKey)) {
-					System.out.println("Find a reusable chat");
-					chat = chatPool.get(chatKey);
-				} else {
-					chat = chatmanager.createChat(to, listener.getChatListener());
-					// chat = chatmanager.createChat(to, chatListener);
-					synchronized (chatPool) {
-						chatPool.put(chatKey, chat);
+					if (chatPool.containsKey(chatKey)) {
+						System.out.println("Find a reusable chat");
+						chat = chatPool.get(chatKey);
+					} else {
+						chat = chatmanager.createChat(to, listener.getChatListener());
+						// chat = chatmanager.createChat(to, chatListener);
+						synchronized (chatPool) {
+							chatPool.put(chatKey, chat);
+						}
 					}
-				}
-				if (null != chat) {
-					Message message = new Message();
-					message.setBody(msg);
-					message.setFrom(username);
-					message.setTo(to);
-					messageId = MessageDelivery(chat, message);
-				} else {
-					System.out.println("Message delivery failed");
+					if (null != chat) {
+						Message message = new Message();
+						message.setBody(msg);
+						message.setFrom(username);
+						message.setTo(to);
+						messageId = MessageDelivery(chat, message);
+					} else {
+						System.out.println("Message delivery failed");
+					}
+				} catch (NotConnectedException ne) {
+					if (null != chat && chatPool.containsKey(chatKey)) {
+						chat.close();
+						chatPool.remove(chatKey);
+						/*
+						 * Check session pool for two users
+						 */
+						if (xmppSessionPool.containsKey(username) && xmppSessionPool.containsKey(to)) {
+							/*
+							 * Create a new chat and call myself again
+							 */
+							SendPlainTextMessage(username, to, msg);
+						}
+					}
+
+					logger.error(
+							String.format("Message deliver failure because of delivery failed:\n %s", ne.getMessage()));
 				}
 			}
 
@@ -169,6 +199,54 @@ public class XMPPSessionManager {
 		}
 
 		return messageId;
+	}
+
+	public boolean logout(String username) throws Exception {
+		boolean result = false;
+		username = this.retriveUsername(username);
+
+		/*
+		 * Check if user has already logged in and have a connection, create one
+		 * otherwise.
+		 */
+		if (xmppSessionPool.containsKey(username)) {
+			result = true;
+			synchronized (xmppSessionPool) {
+				if (null != xmppSessionPool.get(username) && xmppSessionPool.get(username).isConnected())
+					xmppSessionPool.get(username).disconnect();
+				xmppSessionPool.remove(username);
+			}
+
+			/*
+			 * Clean the chat, for the future, should use hazelcast to handle
+			 * this thing
+			 */
+
+			synchronized (chatPool) {
+				/*
+				 * Just add this to solve concurrent modification on hashmap
+				 */
+				Set<String> chatKeyToRemove = new HashSet<String>();
+
+				for (String chatKey : chatPool.keySet()) {
+					if (chatKey.contains(username)) {
+						Chat chat = chatPool.get(chatKey);
+						chat.close();
+						chatKeyToRemove.add(chatKey);
+					}
+				}
+
+				for (String key : chatKeyToRemove) {
+					chatPool.remove(key);
+				}
+
+			}
+
+		} else {
+			result = true;
+		}
+
+		return result;
 	}
 
 	private String MessageDelivery(Chat chat, Message msg) throws NotConnectedException {
@@ -187,28 +265,6 @@ public class XMPPSessionManager {
 	private String getChatKey(String username, String to) {
 		System.out.println("Chat Key: " + (username + to));
 		return username + to;
-	}
-
-	public boolean logout(String username) throws Exception {
-		boolean result = false;
-		username = this.retriveUsername(username);
-
-		/*
-		 * Check if user has already logged in and have a connection, create one
-		 * otherwise.
-		 */
-		if (xmppSessionPool.containsKey(username)) {
-			result = true;
-			synchronized (xmppSessionPool) {
-				if (null != xmppSessionPool.get(username) && xmppSessionPool.get(username).isConnected())
-					xmppSessionPool.get(username).disconnect();
-				xmppSessionPool.remove(username);
-			}
-		} else {
-			result = true;
-		}
-
-		return result;
 	}
 
 	private XMPPTCPConnectionConfiguration notSecureConnectionBuild(String username, String password)

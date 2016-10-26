@@ -5,8 +5,8 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
+import org.springframework.http.HttpStatus;
 
-import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
 public class GenericChatListener implements ChatMessageListener {
@@ -33,8 +33,8 @@ public class GenericChatListener implements ChatMessageListener {
 		try {
 			// client = new IMMessageClient();
 			if (null != message.getBody()) {
-				IMMessageReceivedResponse response = client.messageReceived(message);
-				System.out.println("Message forwarded result : " + response.getMessage());
+				HttpStatus response = client.messageSendToIM(message);
+				System.out.println("Message forwarded result : " + response.toString());
 
 				/*
 				 * Message receipt information
