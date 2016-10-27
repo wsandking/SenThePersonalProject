@@ -67,7 +67,7 @@ public class XMPPController {
 	public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
 			@RequestBody IMMessage im) {
 
-		logger.info(String.format("Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
+		logger.info(String.format("****************Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
 				im.getImRequest().getMessage()));
 
 		System.out.println(String.format("Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),

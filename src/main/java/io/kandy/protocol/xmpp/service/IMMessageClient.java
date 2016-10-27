@@ -3,6 +3,8 @@ package io.kandy.protocol.xmpp.service;
 import java.util.Arrays;
 
 import org.jivesoftware.smack.packet.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpEntity;
@@ -21,6 +23,8 @@ import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 @Service
 @Scope("singleton")
 public class IMMessageClient {
+
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
 	private ConfigurationService configurationService;
@@ -53,8 +57,8 @@ public class IMMessageClient {
 
 		String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
 				configurationService.getPort(), configurationService.getImpath(), sender + "/app/xmpp/im/send");
-
-		System.out.println("Message forwarded to service url: " + url);
+		logger.info("Message forwarded to service url: " + url);
+		System.out.println("**************Message forwarded to service url: " + url);
 		ResponseEntity<?> response = client.exchange(url, HttpMethod.POST, entity, String.class);
 
 		ack = response.getStatusCode();
