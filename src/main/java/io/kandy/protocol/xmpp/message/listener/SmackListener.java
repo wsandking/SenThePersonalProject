@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
+
+// To fix
 @Configuration
 @Service
 public class SmackListener {

@@ -16,9 +16,10 @@ import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 import io.kandy.protocol.xmpp.model.RegisterRequest;
 import io.kandy.protocol.xmpp.model.RegisterResponse;
 import io.kandy.protocol.xmpp.service.XMPPSessionManager;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/rest/version/1/user/{xmppid}/protocol/xmpp/")
+@RequestMapping("/version/1/user/{xmppid}/protocol/xmpp/")
 public class XMPPController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -26,6 +27,7 @@ public class XMPPController {
 	@Autowired
 	private XMPPSessionManager xmppSessionManager;
 
+	@ApiOperation(value = "Login", nickname = "Login", response = RegisterResponse.class)
 	@RequestMapping(value = "/register", method = RequestMethod.POST)
 	public ResponseEntity<RegisterResponse> Login(@PathVariable("xmppid") String xmppid,
 			@RequestBody RegisterRequest request) {
@@ -67,8 +69,8 @@ public class XMPPController {
 	public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
 			@RequestBody IMMessage im) {
 
-		logger.info(String.format("****************Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
-				im.getImRequest().getMessage()));
+		logger.info(String.format("****************Message send from %s to %s :\n %s ", username,
+				im.getImRequest().getToUrl(), im.getImRequest().getMessage()));
 
 		System.out.println(String.format("Message send from %s to %s :\n %s ", username, im.getImRequest().getToUrl(),
 				im.getImRequest().getMessage()));

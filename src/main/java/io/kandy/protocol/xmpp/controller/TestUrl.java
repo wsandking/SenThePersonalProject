@@ -14,7 +14,7 @@ import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 
 @RestController
-@RequestMapping("/rest/version/1/user")
+@RequestMapping("/version/1/user")
 public class TestUrl {
 
 	@RequestMapping(value = "/app/xmpp/im/deliver", method = RequestMethod.POST)

@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import io.kandy.protocol.xmpp.model.IMMessage;
@@ -59,9 +60,16 @@ public class IMMessageClient {
 				configurationService.getPort(), configurationService.getImpath(), sender + "/app/xmpp/im/send");
 		logger.info("Message forwarded to service url: " + url);
 		System.out.println("**************Message forwarded to service url: " + url);
-		ResponseEntity<?> response = client.exchange(url, HttpMethod.POST, entity, String.class);
-
-		ack = response.getStatusCode();
+		/*
+		 * Should have a try and catch mechanism
+		 */
+		try {
+			ResponseEntity<?> response = client.exchange(url, HttpMethod.POST, entity, String.class);
+			ack = response.getStatusCode();
+		} catch (HttpServerErrorException e) {
+			logger.error("Message deliver failed");
+			ack = HttpStatus.CONFLICT;
+		}
 		return ack;
 	}
 

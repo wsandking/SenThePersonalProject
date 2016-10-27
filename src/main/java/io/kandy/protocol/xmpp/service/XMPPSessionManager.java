@@ -179,7 +179,7 @@ public class XMPPSessionManager {
 						chat.close();
 						chatPool.remove(chatKey);
 						/*
-						 * Check session pool for two users
+						 * Check session pool for two users to fix.
 						 */
 						if (xmppSessionPool.containsKey(username) && xmppSessionPool.containsKey(to)) {
 							/*
