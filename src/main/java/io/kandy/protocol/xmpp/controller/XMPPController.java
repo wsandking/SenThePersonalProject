@@ -19,7 +19,7 @@ import io.kandy.protocol.xmpp.service.XMPPSessionManager;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
-@RequestMapping("/version/1/user/{xmppid}/protocol/xmpp/")
+@RequestMapping("/version/1/user/")
 public class XMPPController {
 
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -28,7 +28,7 @@ public class XMPPController {
 	private XMPPSessionManager xmppSessionManager;
 
 	@ApiOperation(value = "Login", nickname = "Login", response = RegisterResponse.class)
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
+	@RequestMapping(value = "/{xmppid}/protocol/xmpp/register", method = RequestMethod.POST)
 	public ResponseEntity<RegisterResponse> Login(@PathVariable("xmppid") String xmppid,
 			@RequestBody RegisterRequest request) {
 
@@ -49,7 +49,8 @@ public class XMPPController {
 		return response;
 	}
 
-	@RequestMapping(value = "/register", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Logout", nickname = "Logout", response = RegisterResponse.class)
+	@RequestMapping(value = "/{xmppid}/protocol/xmpp/register", method = RequestMethod.DELETE)
 	public ResponseEntity<String> Logout(@PathVariable("xmppid") String username) {
 		logger.info(String.format("Username: %s about to logout", username));
 		System.out.println(String.format("Username: %s about to logout", username));
@@ -65,7 +66,8 @@ public class XMPPController {
 		return response;
 	}
 
-	@RequestMapping(value = "/message", method = RequestMethod.POST)
+	@ApiOperation(value = "Logout", nickname = "Logout", response = IMMessageReceipt.class)
+	@RequestMapping(value = "/{xmppid}/protocol/xmpp/message", method = RequestMethod.POST)
 	public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
 			@RequestBody IMMessage im) {
 
