@@ -7,8 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan
 @SpringBootApplication
 public class XMPPApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(XMPPApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(XMPPApplication.class, args);
+  }
 
 }

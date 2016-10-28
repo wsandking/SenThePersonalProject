@@ -8,28 +8,29 @@ import io.kandy.protocol.xmpp.service.IMMessageClient;
 
 public class GenericDeliveryReceiptReceivedListener implements ReceiptReceivedListener {
 
-	private IMMessageClient client;
+  private IMMessageClient client;
 
-	public IMMessageClient getClient() {
-		return client;
-	}
+  public IMMessageClient getClient() {
+    return client;
+  }
 
-	public void setClient(IMMessageClient client) {
-		this.client = client;
-	}
+  public void setClient(IMMessageClient client) {
+    this.client = client;
+  }
 
-	@Override
-	public void onReceiptReceived(String fromJid, String toJid, String deliveryReceiptId, Stanza stanza) {
-		// TODO Auto-generated method stub
-		System.out.println("onReceiptReceived: from: " + fromJid + " to: " + toJid + " deliveryReceiptId: "
-				+ deliveryReceiptId + " stanza: " + stanza);
-		// client = new IMMessageClient();
-		IMMessageReceipt receipt = new IMMessageReceipt();
+  @Override
+  public void onReceiptReceived(String fromJid, String toJid, String deliveryReceiptId,
+      Stanza stanza) {
+    // TODO Auto-generated method stub
+    System.out.println("onReceiptReceived: from: " + fromJid + " to: " + toJid
+        + " deliveryReceiptId: " + deliveryReceiptId + " stanza: " + stanza);
+    // client = new IMMessageClient();
+    IMMessageReceipt receipt = new IMMessageReceipt();
 
-		receipt.setMessageId(deliveryReceiptId);
-		receipt.setStatusCode(0);
+    receipt.setMessageId(deliveryReceiptId);
+    receipt.setStatusCode(0);
 
-		client.messageDelievered(receipt);
-	}
+    client.messageDelievered(receipt);
+  }
 
 }

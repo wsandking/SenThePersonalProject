@@ -14,39 +14,39 @@ import io.kandy.protocol.xmpp.service.IMMessageClient;
 @Service
 public class SmackListener {
 
-	@Autowired
-	private IMMessageClient client;
+  @Autowired
+  private IMMessageClient client;
 
-	@Bean
-	@Scope("prototype")
-	public GenericChatListener getChatListener() {
+  @Bean
+  @Scope("prototype")
+  public GenericChatListener getChatListener() {
 
-		GenericChatListener listener = new GenericChatListener();
-		listener.setClient(client);
+    GenericChatListener listener = new GenericChatListener();
+    listener.setClient(client);
 
-		return listener;
-	}
+    return listener;
+  }
 
-	@Bean
-	@Scope("prototype")
-	public GenericChatManagerListner getChatManagerListener() {
+  @Bean
+  @Scope("prototype")
+  public GenericChatManagerListner getChatManagerListener() {
 
-		if (null == client)
-			System.out.println("Auto wired is failed!!!!!!!!!!!!!!!!!!");
+    if (null == client)
+      System.out.println("Auto wired is failed!!!!!!!!!!!!!!!!!!");
 
-		GenericChatManagerListner chatManager = new GenericChatManagerListner();
-		chatManager.setChatlistener(this.getChatListener());
+    GenericChatManagerListner chatManager = new GenericChatManagerListner();
+    chatManager.setChatlistener(this.getChatListener());
 
-		return chatManager;
-	}
+    return chatManager;
+  }
 
-	@Bean
-	@Scope("prototype")
-	public GenericDeliveryReceiptReceivedListener getDeliveryReceiptReceivedListener() {
-		GenericDeliveryReceiptReceivedListener listener = new GenericDeliveryReceiptReceivedListener();
-		listener.setClient(client);
+  @Bean
+  @Scope("prototype")
+  public GenericDeliveryReceiptReceivedListener getDeliveryReceiptReceivedListener() {
+    GenericDeliveryReceiptReceivedListener listener = new GenericDeliveryReceiptReceivedListener();
+    listener.setClient(client);
 
-		return listener;
-	}
+    return listener;
+  }
 
 }

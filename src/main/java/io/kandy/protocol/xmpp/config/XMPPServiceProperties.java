@@ -7,13 +7,13 @@ import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySources({ @PropertySource("classpath:xmpp.properties"),
-		@PropertySource(value = "file:${external.config}", ignoreResourceNotFound = true) })
+@PropertySources({@PropertySource("classpath:xmpp.properties"),
+    @PropertySource(value = "file:${external.config}", ignoreResourceNotFound = true)})
 public class XMPPServiceProperties {
 
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		return new PropertySourcesPlaceholderConfigurer();
-	}
+  @Bean
+  public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+    return new PropertySourcesPlaceholderConfigurer();
+  }
 
 }
