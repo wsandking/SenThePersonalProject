@@ -1,7 +1,10 @@
-package io.kandy.protocol.xmpp.swagger;
+package io.kandy.protocol.xmpp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.google.common.base.Predicates;
+
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -18,12 +21,12 @@ public class ApiDocConfiguration {
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2).select()
 				.apis(RequestHandlerSelectors.basePackage("io.kandy.protocol.xmpp.controller"))
-				.paths(PathSelectors.any()).build().apiInfo(apiInfo());
+				.paths(PathSelectors.any()).paths(Predicates.not(PathSelectors.regex("/"))).build().apiInfo(apiInfo());
 	}
 
 	private ApiInfo apiInfo() {
-		return new ApiInfoBuilder().title("Learny Api").description("Hier steht die Beschreibung der Api")
-				.termsOfServiceUrl("http://springfox.io").license("Apache License Version 2.0")
+		return new ApiInfoBuilder().title("Kandy XMPP").description("Kandy XMPP Connection Manager")
+				.termsOfServiceUrl("http://kandy.io").license("Apache License Version 2.0")
 				.licenseUrl("https://github.com/springfox/springfox/blob/master/LICENSE").version("2.0").build();
 	}
 }

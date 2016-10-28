@@ -1,4 +1,4 @@
-package io.kandy.protocol.xmpp.app.properties;
+package io.kandy.protocol.xmpp.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
