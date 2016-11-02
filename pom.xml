@@ -37,11 +37,12 @@
 							<include>${project.build.finalName}.jar</include>
 						</resource>
 					</resources>
+					<useConfigFile>true</useConfigFile>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<dependencies>
 		<!-- -->
 		<dependency>
@@ -144,6 +145,14 @@
 			<artifactId>springfox-bean-validators</artifactId>
 			<version>2.6.0</version>
 		</dependency>
+		<!-- Kubernetes Client -->
+		<!-- https://mvnrepository.com/artifact/io.fabric8/kubernetes-client -->
+		<dependency>
+			<groupId>io.fabric8</groupId>
+			<artifactId>kubernetes-client</artifactId>
+			<version>1.4.17</version>
+		</dependency>
+
 	</dependencies>
 
 	<repositories>
