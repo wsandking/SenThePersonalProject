@@ -9,6 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class XMPPApplication {
   public static void main(String[] args) {
     SpringApplication.run(XMPPApplication.class, args);
+    
   }
 
 }
