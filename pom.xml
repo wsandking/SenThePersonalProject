@@ -14,7 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<docker.image.prefix>XMPPConnectionManager</docker.image.prefix>
+		<docker.image.prefix>wsandking</docker.image.prefix>
 	</properties>
 
 	<build>
@@ -37,6 +37,7 @@
 							<include>${project.build.finalName}.jar</include>
 						</resource>
 					</resources>
+                                        <useConfigFile>true</useConfigFile>
 				</configuration>
 			</plugin>
 		</plugins>
