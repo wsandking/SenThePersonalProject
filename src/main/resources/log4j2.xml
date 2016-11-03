@@ -4,8 +4,8 @@
 		<Property name="log-path">applogs</Property>
 		<Property name="kafka.brokers">172.28.247.237:9092</Property>
 		<Property name="kafka.start.topic">ms-start-log</Property>
-		<Property name="kafka.event.topic">mslog</Property>
-		<Property name="microserver.name.id">XMPPConnectionManager</Property>
+		<Property name="kafka.event.topic">userlog</Property>
+		<Property name="microserver.name.id">ms.xmppconn.1</Property>
 	</Properties>
 
 	<Appenders>
@@ -41,7 +41,7 @@
 		<Kafka name="KAFKA-START" topic="${kafka.start.topic}">
 			<ThresholdFilter level="ALL" onMatch="ACCEPT"
 				onMismatch="DENY" />
-			<PatternLayout pattern="${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %m" />
+			<PatternLayout pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %m" />
 			<Property name="bootstrap.servers">${kafka.brokers}</Property>
 		</Kafka>
 
