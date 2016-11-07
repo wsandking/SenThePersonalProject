@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import io.kandy.protocol.xmpp.message.listener.SmackListener;
+import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 
 /*
  * Shouldn't have put all logic here, should make a new class that is not singleton retrieve
@@ -51,6 +52,9 @@ public class XMPPSessionManager {
 
   @Autowired
   private ConfigurationService configurationService;
+
+  @Autowired
+  private KuberneteClient kuberneteClient;
 
   @Autowired
   private SmackListener listener;
@@ -132,70 +136,26 @@ public class XMPPSessionManager {
     return streamId;
   }
 
-  public String SendPlainTextMessage(String username, String to, String msg) throws Exception {
+  public String MiroserviceSendPlainTextMessage(String username, String to, String msg)
+      throws Exception {
     String messageId = null;
     username = this.retriveUsername(username);
     to = this.makeToUrl(to);
-
     /*
      * Check if user has already logged in and have a connection, create one otherwise.
      */
-    if (xmppSessionPool.containsKey(username)) {
-
-      if (null != xmppSessionPool.get(username) && xmppSessionPool.get(username).isConnected()) {
-        AbstractXMPPConnection connection = xmppSessionPool.get(username);
-        ChatManager chatmanager = ChatManager.getInstanceFor(connection);
-        String chatKey = getChatKey(username, to);
-
-        /*
-         * Enable message receipt
-         */
-        Chat chat = null;
-        try {
-
-          if (chatPool.containsKey(chatKey)) {
-            System.out.println("Find a reusable chat");
-            chat = chatPool.get(chatKey);
-          } else {
-            chat = chatmanager.createChat(to, listener.getChatListener());
-            // chat = chatmanager.createChat(to, chatListener);
-            synchronized (chatPool) {
-              chatPool.put(chatKey, chat);
-            }
-          }
-          if (null != chat) {
-            Message message = new Message();
-            message.setBody(msg);
-            message.setFrom(username);
-            message.setTo(to);
-            messageId = MessageDelivery(chat, message);
-          } else {
-            System.out.println("Message delivery failed");
-          }
-        } catch (NotConnectedException ne) {
-          if (null != chat && chatPool.containsKey(chatKey)) {
-            chat.close();
-            chatPool.remove(chatKey);
-            /*
-             * Check session pool for two users to fix.
-             */
-            if (xmppSessionPool.containsKey(username) && xmppSessionPool.containsKey(to)) {
-              /*
-               * Create a new chat and call myself again
-               */
-              SendPlainTextMessage(username, to, msg);
-            }
-          }
-
-          logger.error(String.format("Message deliver failure because of delivery failed:\n %s",
-              ne.getMessage()));
-        }
-      }
-
+    if (xmppSessionPool.containsKey(username) && null != xmppSessionPool.get(username)
+        && xmppSessionPool.get(username).isConnected()) {
+      messageId = this.SendPlainTextMessage(username, to, msg);
     } else {
-      throw new Exception("Message deliver failure");
+      /*
+       * Brocast see if anyone on my subnet has it
+       */
+      IMMessageReceipt receipt = null;
+      receipt = kuberneteClient.brocastPlainMessage(username, to, msg);
+      if (null == receipt)
+        throw new Exception("Message deliver failure");
     }
-
     return messageId;
   }
 
@@ -243,6 +203,74 @@ public class XMPPSessionManager {
     }
 
     return result;
+  }
+
+  public String brocastMessage(String username, String to, String msg) throws Exception {
+    String messageId = null;
+    if (xmppSessionPool.containsKey(username) && null != xmppSessionPool.get(username)
+        && xmppSessionPool.get(username).isConnected()) {
+      messageId = this.SendPlainTextMessage(username, to, msg);
+    } else {
+      /*
+       * Do not need to proceed just return empty
+       */
+    }
+
+
+    return messageId;
+  }
+
+
+  private String SendPlainTextMessage(String username, String to, String msg) throws Exception {
+    String messageId = null;
+    AbstractXMPPConnection connection = xmppSessionPool.get(username);
+    ChatManager chatmanager = ChatManager.getInstanceFor(connection);
+    String chatKey = getChatKey(username, to);
+
+    /*
+     * Enable message receipt
+     */
+    Chat chat = null;
+    try {
+
+      if (chatPool.containsKey(chatKey)) {
+        System.out.println("Find a reusable chat");
+        chat = chatPool.get(chatKey);
+      } else {
+        chat = chatmanager.createChat(to, listener.getChatListener());
+        // chat = chatmanager.createChat(to, chatListener);
+        synchronized (chatPool) {
+          chatPool.put(chatKey, chat);
+        }
+      }
+      if (null != chat) {
+        Message message = new Message();
+        message.setBody(msg);
+        message.setFrom(username);
+        message.setTo(to);
+        messageId = MessageDelivery(chat, message);
+      } else {
+        System.out.println("Message delivery failed");
+      }
+    } catch (NotConnectedException ne) {
+      if (null != chat && chatPool.containsKey(chatKey)) {
+        chat.close();
+        chatPool.remove(chatKey);
+        /*
+         * Check session pool for two users to fix.
+         */
+        if (xmppSessionPool.containsKey(username)) {
+          /*
+           * Create a new chat and call myself again
+           */
+          MiroserviceSendPlainTextMessage(username, to, msg);
+        }
+      }
+
+      logger.error(String.format("Message deliver failure because of delivery failed:\n %s",
+          ne.getMessage()));
+    }
+    return messageId;
   }
 
   private String MessageDelivery(Chat chat, Message msg) throws NotConnectedException {

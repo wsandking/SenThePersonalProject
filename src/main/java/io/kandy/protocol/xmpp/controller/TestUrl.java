@@ -71,7 +71,7 @@ public class TestUrl {
 
   }
 
-  @RequestMapping(value = "/{xmppid}/app/xmpp/im/receive", method = RequestMethod.POST)
+  @RequestMapping(value = "/{xmppid}/app/xmpp/im/send", method = RequestMethod.POST)
   public ResponseEntity<IMMessageReceivedResponse> testPostReceivedChannel(
       @PathVariable("xmppid") String username, @RequestBody IMMessage im) {
 

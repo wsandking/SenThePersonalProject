@@ -4,14 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
 
-// To fix
 @Configuration
-@Service
+@Component
+@Scope("singleton")
 public class SmackListener {
 
   @Autowired

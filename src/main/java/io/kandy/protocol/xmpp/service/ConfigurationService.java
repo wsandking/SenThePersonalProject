@@ -34,6 +34,15 @@ public class ConfigurationService {
   @Value("${im.server.domain.name}")
   private String domainName;
 
+  @Value("${xmpp.services.label}")
+  private String xmppServiceLabel;
+
+  @Value("${xmpp.container.services.port}")
+  private String xmppServicePort;
+
+  @Value("${kubernetes.master.url}")
+  private String kubernetesMasterUrl;
+
   public String getDomainName() {
     return domainName;
   }
@@ -105,5 +114,31 @@ public class ConfigurationService {
   public void setImpath(String impath) {
     this.impath = impath;
   }
+
+  public String getXmppServiceLabel() {
+    return xmppServiceLabel;
+  }
+
+  public void setXmppServiceName(String xmppServiceName) {
+    this.xmppServiceLabel = xmppServiceName;
+  }
+
+  public String getXmppServicePort() {
+    return xmppServicePort;
+  }
+
+  public void setXmppServicePort(String xmppServicePort) {
+    this.xmppServicePort = xmppServicePort;
+  }
+
+  public String getKubernetesMasterUrl() {
+    return kubernetesMasterUrl;
+  }
+
+  public void setKubernetesMasterUrl(String kubernetesMasterUrl) {
+    this.kubernetesMasterUrl = kubernetesMasterUrl;
+  }
+
+
 
 }
