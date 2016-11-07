@@ -1,5 +1,13 @@
 package io.kandy.protocol.xmpp.controller;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +24,38 @@ import io.kandy.protocol.xmpp.model.IMMessageReceivedResponse;
 @RestController
 @RequestMapping("/version/1/user")
 public class TestUrl {
+
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+  @RequestMapping(value = "/ip", method = RequestMethod.GET)
+  public ResponseEntity<ArrayList<String>> getHostIP() {
+
+    ArrayList<String> ips = new ArrayList<String>();
+    ResponseEntity<ArrayList<String>> response = null;
+    Enumeration<NetworkInterface> e;
+    try {
+      e = NetworkInterface.getNetworkInterfaces();
+      while (e.hasMoreElements()) {
+        NetworkInterface n = (NetworkInterface) e.nextElement();
+        Enumeration<InetAddress> ee = n.getInetAddresses();
+        while (ee.hasMoreElements()) {
+          InetAddress i = (InetAddress) ee.nextElement();
+          System.out.println(i.getHostAddress());
+          ips.add(i.getHostAddress());
+          logger.info(i.getHostAddress());
+        }
+      }
+      response = new ResponseEntity<ArrayList<String>>(ips, HttpStatus.CREATED);
+    } catch (SocketException e1) {
+      // TODO Auto-generated catch block
+      logger.info("Cannot read IP address");
+      e1.printStackTrace();
+    }
+
+    return response;
+
+  }
 
   @RequestMapping(value = "/app/xmpp/im/deliver", method = RequestMethod.POST)
   public ResponseEntity<IMMessageDeliveredAck> testPostChannel(@RequestBody IMMessageReceipt ir) {

@@ -19,7 +19,7 @@ public class XMPPApplication {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       public void run() {
         if (ctx instanceof ConfigurableApplicationContext) {
-          logger.info("Shuting down");
+          logger.info("Application closing");
           ((ConfigurableApplicationContext) ctx).close();
         }
       }

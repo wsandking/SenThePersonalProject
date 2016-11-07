@@ -268,6 +268,8 @@ public class XMPPSessionManager {
 
     // System.out.println(String.format("Host: %s : port: %d",
     // defaultHostIp, defaultPort));
+    logger.info(String.format("Host: %s : port: %d", configurationService.getDefaultHostIp(),
+        configurationService.getPort()));
     System.out.println(String.format("Host: %s : port: %d", configurationService.getDefaultHostIp(),
         configurationService.getPort()));
 
