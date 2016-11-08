@@ -44,7 +44,7 @@ public class XMPPController {
       @RequestBody RegisterRequest request) {
 
     logger.info(String.format("System %s ----- username: %s --------- login request",
-        xmppSessionManager.instanceInfoStamp().get(0), xmppid));
+        xmppSessionManager.instanceInfoStamp().get(1), xmppid));
 
     ResponseEntity<RegisterResponse> response;
     try {
@@ -72,7 +72,7 @@ public class XMPPController {
   @RequestMapping(value = "/{xmppid}/protocol/xmpp/register", method = RequestMethod.DELETE)
   public ResponseEntity<String> Logout(@PathVariable("xmppid") String username) {
     logger.info(String.format("System %s ----- user: %s logging out",
-        xmppSessionManager.instanceInfoStamp().get(0), username));
+        xmppSessionManager.instanceInfoStamp().get(1), username));
     System.out.println(String.format("Username: %s about to logout", username));
     ResponseEntity<String> response;
 
@@ -101,7 +101,7 @@ public class XMPPController {
   public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
       @RequestBody IMMessage im) {
     logger.info(String.format("System %s \n Message sending from %s to %s :\n %s ",
-        xmppSessionManager.instanceInfoStamp().get(0), username, im.getImRequest().getToUrl(),
+        xmppSessionManager.instanceInfoStamp().get(1), username, im.getImRequest().getToUrl(),
         im.getImRequest().getMessage()));
 
     System.out.println(String.format("Message send from %s to %s :\n %s ", username,
