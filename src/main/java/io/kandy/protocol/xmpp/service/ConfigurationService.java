@@ -43,13 +43,13 @@ public class ConfigurationService {
   @Value("${kubernetes.master.url}")
   private String kubernetesMasterUrl;
 
-  @Value("xmpp.brocast.message.url")
+  @Value("${xmpp.brocast.message.url}")
   private String xmppBrocastMessageUrl;
 
-  @Value("xmpp.brocast.logout.url")
+  @Value("${xmpp.brocast.logout.url}")
   private String xmppBrocastLogoutUrl;
 
-  @Value("xmpp.context.prefix")
+  @Value("${xmpp.context.prefix}")
   private String xmppContextUrl;
 
   public String getDomainName() {

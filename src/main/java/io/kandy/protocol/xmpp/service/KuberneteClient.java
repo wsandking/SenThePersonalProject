@@ -57,9 +57,9 @@ public class KuberneteClient {
      * Make message first
      */
     String messageId = null;
-    logger.info("Start brocast message + " + msg);
+    logger.info("Start brocast message:  " + msg);
     IMMessage im = new IMMessage(to, msg);
-    
+
     for (String url : this.getMessageBrocastURLs(username)) {
       logger.info("Querying url: " + url);
       messageId = this.forwardPlainTextRequest(url, im);
@@ -76,21 +76,22 @@ public class KuberneteClient {
      */
     String applicationPath = configurationService.getXmppContextUrl();
     String messageBrocast = configurationService.getXmppBrocastMessageUrl();
-    return this.makeURLs(applicationPath, messageBrocast);
+
+    return this.makeURLs(applicationPath, username, messageBrocast);
 
   }
 
-  private List<String> makeURLs(String applicationPath, String brocastPath) {
+  private List<String> makeURLs(String applicationPath, String username, String brocastPath) {
     List<String> urls = new ArrayList<String>();
     int servicePort = Integer.parseInt(configurationService.getXmppServicePort());
-
+    logger.info("Start making URLs");
     for (Endpoints endpoint : client.endpoints()
         .withLabel("name", configurationService.getXmppServiceLabel()).list().getItems()) {
-
+      logger.info("Start making URLs");
       for (EndpointSubset subset : endpoint.getSubsets()) {
         for (EndpointAddress address : subset.getAddresses()) {
           urls.add(String.format("http://%s:%d%s%s%s", address.getIp(), servicePort,
-              applicationPath, brocastPath));
+              applicationPath, username, brocastPath));
         }
       }
     }
