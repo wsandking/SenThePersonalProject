@@ -34,14 +34,16 @@
 		<Kafka name="KAFKA" topic="${kafka.event.topic}">
 			<ThresholdFilter level="ALL" onMatch="ACCEPT"
 				onMismatch="DENY" />
-			<PatternLayout pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %4p %t (%F:%L) %m" />
+			<PatternLayout
+				pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %4p %t (%F:%L) %m" />
 			<Property name="bootstrap.servers">${kafka.brokers}</Property>
 		</Kafka>
 
 		<Kafka name="KAFKA-START" topic="${kafka.start.topic}">
 			<ThresholdFilter level="ALL" onMatch="ACCEPT"
 				onMismatch="DENY" />
-			<PatternLayout pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %m" />
+			<PatternLayout
+				pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %m" />
 			<Property name="bootstrap.servers">${kafka.brokers}</Property>
 		</Kafka>
 
@@ -65,10 +67,13 @@
 			<AppenderRef ref="KAFKA" />
 			<AppenderRef ref="Console-Appender" />
 		</Logger>
-		<Logger name="io.kandy.protocol.xmpp.XMPPApplication"
-            level="info">
-            <AppenderRef ref="KAFKA-START" />
-        </Logger>
+		<Logger name="io.kandy.protocol.xmpp.XMPPApplication" level="info">
+			<AppenderRef ref="KAFKA-START" />
+		</Logger>
+		<Logger name="io.kandy.protocol.xmpp.service.KuberneteClient"
+			level="info">
+			<AppenderRef ref="KAFKA" />
+		</Logger>
 		<Logger name="org.apache.kafka" level="info" />
 	</Loggers>
 </Configuration>

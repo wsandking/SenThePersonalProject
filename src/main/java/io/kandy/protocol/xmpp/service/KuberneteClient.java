@@ -58,8 +58,8 @@ public class KuberneteClient {
      */
     String messageId = null;
     IMMessage im = new IMMessage(to, msg);
-
     for (String url : this.getMessageBrocastURLs(username)) {
+      logger.info("Querying url: " + url);
       messageId = this.forwardPlainTextRequest(url, im);
       if (null != messageId)
         break;
@@ -81,7 +81,7 @@ public class KuberneteClient {
   private List<String> makeURLs(String applicationPath, String brocastPath) {
     List<String> urls = new ArrayList<String>();
     int servicePort = Integer.parseInt(configurationService.getXmppServicePort());
-    
+
     for (Endpoints endpoint : client.endpoints()
         .withLabel("name", configurationService.getXmppServiceLabel()).list().getItems()) {
 
