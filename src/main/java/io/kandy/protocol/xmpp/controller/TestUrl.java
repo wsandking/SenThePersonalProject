@@ -52,9 +52,7 @@ public class TestUrl {
       logger.info("Cannot read IP address");
       e1.printStackTrace();
     }
-
     return response;
-
   }
 
   @RequestMapping(value = "/app/xmpp/im/deliver", method = RequestMethod.POST)

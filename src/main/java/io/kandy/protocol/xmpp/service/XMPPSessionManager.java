@@ -1,9 +1,15 @@
 package io.kandy.protocol.xmpp.service;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,6 +100,32 @@ public class XMPPSessionManager {
     }
     xmppSessionPool.clear();
 
+  }
+
+  /*
+   * Print the instance information
+   */
+  public List<String> instanceInfoStamp() {
+
+    ArrayList<String> ips = new ArrayList<String>();
+    Enumeration<NetworkInterface> e;
+    try {
+      e = NetworkInterface.getNetworkInterfaces();
+      while (e.hasMoreElements()) {
+        NetworkInterface n = (NetworkInterface) e.nextElement();
+        Enumeration<InetAddress> ee = n.getInetAddresses();
+        while (ee.hasMoreElements()) {
+          InetAddress i = (InetAddress) ee.nextElement();
+          ips.add(i.getHostAddress());
+        }
+      }
+
+    } catch (SocketException e1) {
+      // TODO Auto-generated catch block
+      logger.info("Cannot read IP address");
+      e1.printStackTrace();
+    }
+    return ips;
   }
 
   public String login(String username, String passwd) throws Exception {
@@ -326,6 +358,8 @@ public class XMPPSessionManager {
     return xmppId;
 
   }
+
+
 
   private String makeToUrl(String to) {
 

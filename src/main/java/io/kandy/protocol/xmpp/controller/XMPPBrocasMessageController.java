@@ -40,6 +40,8 @@ public class XMPPBrocasMessageController {
   @RequestMapping(value = "/{xmppid}/brocast/message", method = RequestMethod.POST)
   public ResponseEntity<String> brocastMessage(@PathVariable("xmppid") String username,
       @RequestBody IMMessage im) {
+    logger.info(
+        String.format("System %s process messages", xmppSessionManager.instanceInfoStamp().get(0)));
     logger.info(String.format("****************Message Broacst!!!: %s to %s :\n %s ", username,
         im.getImRequest().getToUrl(), im.getImRequest().getMessage()));
 
@@ -69,6 +71,8 @@ public class XMPPBrocasMessageController {
   @RequestMapping(value = "/{xmppid}/brocast/message", method = RequestMethod.DELETE)
   public ResponseEntity<String> brocastLogout(@PathVariable("xmppid") String username,
       @RequestBody IMMessage im) {
+    logger.info(
+        String.format("System %s process messages", xmppSessionManager.instanceInfoStamp().get(0)));
     logger.info(String.format("Brocast Received: Username: %s logout", username));
     /*
      * Initiliaze as Not found

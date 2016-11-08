@@ -43,8 +43,8 @@ public class XMPPController {
   public ResponseEntity<RegisterResponse> Login(@PathVariable("xmppid") String xmppid,
       @RequestBody RegisterRequest request) {
 
-    logger
-        .info(String.format("Username: %s --------- Password: %s", xmppid, request.getPassword()));
+    logger.info(String.format("System %s ----- username: %s --------- login request",
+        xmppSessionManager.instanceInfoStamp().get(0), xmppid));
 
     ResponseEntity<RegisterResponse> response;
     try {
@@ -71,7 +71,8 @@ public class XMPPController {
       @ApiResponse(code = 400, message = "Logout Operation Failure")})
   @RequestMapping(value = "/{xmppid}/protocol/xmpp/register", method = RequestMethod.DELETE)
   public ResponseEntity<String> Logout(@PathVariable("xmppid") String username) {
-    logger.info(String.format("User: %s logging out", username));
+    logger.info(String.format("System %s ----- user: %s logging out",
+        xmppSessionManager.instanceInfoStamp().get(0), username));
     System.out.println(String.format("Username: %s about to logout", username));
     ResponseEntity<String> response;
 
@@ -99,8 +100,9 @@ public class XMPPController {
   @RequestMapping(value = "/{xmppid}/protocol/xmpp/message", method = RequestMethod.POST)
   public ResponseEntity<IMMessageReceipt> SendMessage(@PathVariable("xmppid") String username,
       @RequestBody IMMessage im) {
-    logger.info(String.format("****************Message send from %s to %s :\n %s ", username,
-        im.getImRequest().getToUrl(), im.getImRequest().getMessage()));
+    logger.info(String.format("System %s \n Message sending from %s to %s :\n %s ",
+        xmppSessionManager.instanceInfoStamp().get(0), username, im.getImRequest().getToUrl(),
+        im.getImRequest().getMessage()));
 
     System.out.println(String.format("Message send from %s to %s :\n %s ", username,
         im.getImRequest().getToUrl(), im.getImRequest().getMessage()));
