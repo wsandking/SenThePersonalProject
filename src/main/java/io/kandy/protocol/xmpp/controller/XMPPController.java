@@ -110,7 +110,7 @@ public class XMPPController {
     IMMessageReceipt receipt = new IMMessageReceipt();
 
     try {
-      String messageId = xmppSessionManager.MiroserviceSendPlainTextMessage(username,
+      String messageId = xmppSessionManager.miroserviceSendPlainTextMessage(username,
           im.getImRequest().getToUrl(), im.getImRequest().getMessage());
 
       receipt.setMessageId(messageId);

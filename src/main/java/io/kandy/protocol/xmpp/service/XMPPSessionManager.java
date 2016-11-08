@@ -168,7 +168,7 @@ public class XMPPSessionManager {
     return streamId;
   }
 
-  public String MiroserviceSendPlainTextMessage(String username, String to, String msg)
+  public String miroserviceSendPlainTextMessage(String username, String to, String msg)
       throws Exception {
     String messageId = null;
     username = this.retriveUsername(username);
@@ -299,7 +299,7 @@ public class XMPPSessionManager {
           /*
            * Create a new chat and call myself again
            */
-          MiroserviceSendPlainTextMessage(username, to, msg);
+          miroserviceSendPlainTextMessage(username, to, msg);
         }
       }
 

@@ -1,8 +1,12 @@
 package io.kandy.protocol.xmpp.service;
 
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -36,6 +40,8 @@ public class KuberneteClient {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private KubernetesClient client;
+  private String localIp;
+
 
   @Autowired
   private ConfigurationService configurationService;
@@ -49,7 +55,7 @@ public class KuberneteClient {
     Config config =
         new ConfigBuilder().withMasterUrl(configurationService.getKubernetesMasterUrl()).build();
     client = new DefaultKubernetesClient(config);
-
+    localIp = this.instanceInfoStamp().get(1);
   }
 
   public String brocastPlainMessage(String username, String to, String msg) {
@@ -90,8 +96,11 @@ public class KuberneteClient {
       logger.info("Start making URLs");
       for (EndpointSubset subset : endpoint.getSubsets()) {
         for (EndpointAddress address : subset.getAddresses()) {
-          urls.add(String.format("http://%s:%d%s%s%s", address.getIp(), servicePort,
-              applicationPath, username, brocastPath));
+          if (!address.getIp().equals(this.localIp))
+            urls.add(String.format("http://%s:%d%s%s%s", address.getIp(), servicePort,
+                applicationPath, username, brocastPath));
+          else
+            logger.info("Self IP Address");
         }
       }
     }
@@ -117,5 +126,33 @@ public class KuberneteClient {
     }
 
     return messageId;
+  }
+
+  /**
+   * A hack, should be removed soon
+   * 
+   * @return
+   */
+  private List<String> instanceInfoStamp() {
+
+    ArrayList<String> ips = new ArrayList<String>();
+    Enumeration<NetworkInterface> e;
+    try {
+      e = NetworkInterface.getNetworkInterfaces();
+      while (e.hasMoreElements()) {
+        NetworkInterface n = (NetworkInterface) e.nextElement();
+        Enumeration<InetAddress> ee = n.getInetAddresses();
+        while (ee.hasMoreElements()) {
+          InetAddress i = (InetAddress) ee.nextElement();
+          ips.add(i.getHostAddress());
+        }
+      }
+
+    } catch (SocketException e1) {
+      // TODO Auto-generated catch block
+      logger.info("Cannot read IP address");
+      e1.printStackTrace();
+    }
+    return ips;
   }
 }
