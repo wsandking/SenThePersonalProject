@@ -56,7 +56,7 @@ public class IMMessageClient {
     // configurationService.getPort(), configurationService.getImpath(),
     // sender + "/app/xmpp/im/receive");
 
-    String url = String.format("http://%s:%d/%s/%s", configurationService.getImhost(),
+    String url = String.format("http://%s:%d%s/%s", configurationService.getImhost(),
         configurationService.getPort(), configurationService.getImpath(),
         sender + "/app/xmpp/im/send");
     logger.info("Message forwarded to service url: " + url);

@@ -2,6 +2,7 @@ package io.kandy.protocol.xmpp.service;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -10,7 +11,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestTemplate;
 
 import io.fabric8.kubernetes.api.model.EndpointAddress;
 import io.fabric8.kubernetes.api.model.EndpointSubset;
@@ -20,7 +29,6 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.kandy.protocol.xmpp.model.IMMessage;
-import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 
 @Service
 @Scope("singleton")
@@ -28,7 +36,6 @@ public class KuberneteClient {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private KubernetesClient client;
-
 
   @Autowired
   private ConfigurationService configurationService;
@@ -45,43 +52,65 @@ public class KuberneteClient {
 
   }
 
-  public IMMessageReceipt brocastPlainMessage(String username, String to, String msg) {
-
+  public String brocastPlainMessage(String username, String to, String msg) {
     /*
      * Make message first
      */
+    String messageId = null;
+    IMMessage im = new IMMessage(to, msg);
 
-
-
-    for (String url : this.getPodsURLs()) {
-
+    for (String url : this.getMessageBrocastURLs(username)) {
+      messageId = this.forwardPlainTextRequest(url, im);
+      if (null != messageId)
+        break;
     }
-
-    return null;
+    logger.info("Message brocast finished!");
+    return messageId;
   }
 
-  private List<String> getPodsURLs() {
+  private List<String> getMessageBrocastURLs(String username) {
     /*
-     * Use label
+     * Get a properties for this later, maybe
      */
+    String applicationPath = configurationService.getXmppContextUrl();
+    String messageBrocast = configurationService.getXmppBrocastMessageUrl();
+    return this.makeURLs(applicationPath, messageBrocast);
+
+  }
+
+  private List<String> makeURLs(String applicationPath, String brocastPath) {
     List<String> urls = new ArrayList<String>();
     int servicePort = Integer.parseInt(configurationService.getXmppServicePort());
-
+    
     for (Endpoints endpoint : client.endpoints()
         .withLabel("name", configurationService.getXmppServiceLabel()).list().getItems()) {
 
       for (EndpointSubset subset : endpoint.getSubsets()) {
-
         for (EndpointAddress address : subset.getAddresses()) {
-          urls.add(String.format("http://%s:%d", address.getIp(), servicePort));
+          urls.add(String.format("http://%s:%d%s%s%s", address.getIp(), servicePort,
+              applicationPath, brocastPath));
         }
       }
     }
     return urls;
   }
 
-  public IMMessageReceipt forwardPlainTextRequest(String url, IMMessage msg) {
+  public String forwardPlainTextRequest(String url, IMMessage im) {
+    String messageId = null;
 
-    return null;
+    RestTemplate client = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML));
+    HttpEntity<IMMessage> entity = new HttpEntity<IMMessage>(im, headers);
+
+    try {
+      ResponseEntity<String> response = client.exchange(url, HttpMethod.POST, entity, String.class);
+      if (HttpStatus.NOT_FOUND != response.getStatusCode())
+        messageId = response.getBody();
+    } catch (HttpServerErrorException e) {
+      logger.warn(String.format("User not found in %s ", url));
+    }
+
+    return messageId;
   }
 }

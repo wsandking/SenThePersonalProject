@@ -20,7 +20,7 @@ import io.swagger.annotations.ApiResponses;
 
 
 @RestController
-@RequestMapping("/brocast")
+@RequestMapping("/version/1/user/")
 public class XMPPBrocasMessageController {
 
 
@@ -37,8 +37,8 @@ public class XMPPBrocasMessageController {
       @ApiResponse(code = 201, message = "Message successfully found and brocast",
           response = IMMessageReceipt.class),
       @ApiResponse(code = 404, message = "Cannot find user in this host")})
-  @RequestMapping(value = "/{xmppid}/message", method = RequestMethod.POST)
-  public ResponseEntity<IMMessageReceipt> ForwardMessage(@PathVariable("xmppid") String username,
+  @RequestMapping(value = "/{xmppid}/brocast/message", method = RequestMethod.POST)
+  public ResponseEntity<String> brocastMessage(@PathVariable("xmppid") String username,
       @RequestBody IMMessage im) {
     logger.info(String.format("****************Message Broacst!!!: %s to %s :\n %s ", username,
         im.getImRequest().getToUrl(), im.getImRequest().getMessage()));
@@ -49,20 +49,40 @@ public class XMPPBrocasMessageController {
     /*
      * Initiliaze as Not found
      */
-    ResponseEntity<IMMessageReceipt> response;
-    IMMessageReceipt receipt = new IMMessageReceipt();
-    response = new ResponseEntity<IMMessageReceipt>(receipt, HttpStatus.NOT_FOUND);
+    ResponseEntity<String> response;
+    response = new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
 
     try {
       String messageId = xmppSessionManager.brocastMessage(username, im.getImRequest().getToUrl(),
           im.getImRequest().getMessage());
       if (null != messageId) {
-        receipt.setMessageId(messageId);
-        receipt.setStatusCode(0);
-        response = new ResponseEntity<IMMessageReceipt>(receipt, HttpStatus.CREATED);
+        response = new ResponseEntity<String>(messageId, HttpStatus.CREATED);
       }
     } catch (Exception e) {
+    }
+    return response;
+  }
 
+  @ApiOperation(value = "Brocast logout", nickname = "Brocast logout")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "Logout Successful"),
+      @ApiResponse(code = 400, message = "Logout Operation Failure")})
+  @RequestMapping(value = "/{xmppid}/brocast/message", method = RequestMethod.DELETE)
+  public ResponseEntity<String> brocastLogout(@PathVariable("xmppid") String username,
+      @RequestBody IMMessage im) {
+    logger.info(String.format("Brocast Received: Username: %s logout", username));
+    /*
+     * Initiliaze as Not found
+     */
+    ResponseEntity<String> response;
+    response = new ResponseEntity<String>("", HttpStatus.NOT_FOUND);
+
+    try {
+      String messageId = xmppSessionManager.brocastMessage(username, im.getImRequest().getToUrl(),
+          im.getImRequest().getMessage());
+      if (null != messageId) {
+        response = new ResponseEntity<String>(messageId, HttpStatus.CREATED);
+      }
+    } catch (Exception e) {
     }
     return response;
   }

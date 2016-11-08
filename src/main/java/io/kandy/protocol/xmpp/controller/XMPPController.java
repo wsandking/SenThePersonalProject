@@ -71,7 +71,7 @@ public class XMPPController {
       @ApiResponse(code = 400, message = "Logout Operation Failure")})
   @RequestMapping(value = "/{xmppid}/protocol/xmpp/register", method = RequestMethod.DELETE)
   public ResponseEntity<String> Logout(@PathVariable("xmppid") String username) {
-    logger.info(String.format("Username: %s about to logout", username));
+    logger.info(String.format("User: %s logging out", username));
     System.out.println(String.format("Username: %s about to logout", username));
     ResponseEntity<String> response;
 
@@ -127,5 +127,5 @@ public class XMPPController {
   }
 
 
-  
+
 }

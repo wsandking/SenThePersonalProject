@@ -43,6 +43,15 @@ public class ConfigurationService {
   @Value("${kubernetes.master.url}")
   private String kubernetesMasterUrl;
 
+  @Value("xmpp.brocast.message.url")
+  private String xmppBrocastMessageUrl;
+
+  @Value("xmpp.brocast.logout.url")
+  private String xmppBrocastLogoutUrl;
+
+  @Value("xmpp.context.prefix")
+  private String xmppContextUrl;
+
   public String getDomainName() {
     return domainName;
   }
@@ -139,6 +148,32 @@ public class ConfigurationService {
     this.kubernetesMasterUrl = kubernetesMasterUrl;
   }
 
+  public String getXmppBrocastMessageUrl() {
+    return xmppBrocastMessageUrl;
+  }
 
+  public void setXmppBrocastMessageUrl(String xmppBrocastMessageUrl) {
+    this.xmppBrocastMessageUrl = xmppBrocastMessageUrl;
+  }
+
+  public String getXmppBrocastLogoutUrl() {
+    return xmppBrocastLogoutUrl;
+  }
+
+  public void setXmppBrocastLogoutUrl(String xmppBrocastLogoutUrl) {
+    this.xmppBrocastLogoutUrl = xmppBrocastLogoutUrl;
+  }
+
+  public String getXmppContextUrl() {
+    return xmppContextUrl;
+  }
+
+  public void setXmppContextUrl(String xmppContextUrl) {
+    this.xmppContextUrl = xmppContextUrl;
+  }
+
+  public void setXmppServiceLabel(String xmppServiceLabel) {
+    this.xmppServiceLabel = xmppServiceLabel;
+  }
 
 }

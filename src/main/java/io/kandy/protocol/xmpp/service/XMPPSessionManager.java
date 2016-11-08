@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import io.kandy.protocol.xmpp.message.listener.SmackListener;
-import io.kandy.protocol.xmpp.model.IMMessageReceipt;
+
 
 /*
  * Shouldn't have put all logic here, should make a new class that is not singleton retrieve
@@ -151,9 +151,9 @@ public class XMPPSessionManager {
       /*
        * Brocast see if anyone on my subnet has it
        */
-      IMMessageReceipt receipt = null;
-      receipt = kuberneteClient.brocastPlainMessage(username, to, msg);
-      if (null == receipt)
+
+      messageId = kuberneteClient.brocastPlainMessage(username, to, msg);
+      if (null == messageId)
         throw new Exception("Message deliver failure");
     }
     return messageId;
@@ -207,15 +207,20 @@ public class XMPPSessionManager {
 
   public String brocastMessage(String username, String to, String msg) throws Exception {
     String messageId = null;
+    /*
+     * It has already be processed
+     */
+    // username = this.retriveUsername(username);
+
     if (xmppSessionPool.containsKey(username) && null != xmppSessionPool.get(username)
         && xmppSessionPool.get(username).isConnected()) {
+      // to = this.makeToUrl(to);
       messageId = this.SendPlainTextMessage(username, to, msg);
     } else {
       /*
        * Do not need to proceed just return empty
        */
     }
-
 
     return messageId;
   }
@@ -226,7 +231,6 @@ public class XMPPSessionManager {
     AbstractXMPPConnection connection = xmppSessionPool.get(username);
     ChatManager chatmanager = ChatManager.getInstanceFor(connection);
     String chatKey = getChatKey(username, to);
-
     /*
      * Enable message receipt
      */
@@ -274,13 +278,11 @@ public class XMPPSessionManager {
   }
 
   private String MessageDelivery(Chat chat, Message msg) throws NotConnectedException {
-
     String deliveryReceiptId = DeliveryReceiptRequest.addTo(msg);
     chat.sendMessage(msg);
 
     System.out.println("sendMessage: deliveryReceiptId for this message is: " + deliveryReceiptId);
     return deliveryReceiptId;
-
   }
 
   /*
