@@ -111,6 +111,8 @@ public class KuberneteClient {
       if (HttpStatus.NOT_FOUND != response.getStatusCode())
         messageId = response.getBody();
     } catch (HttpServerErrorException e) {
+      logger.warn(String.format("System error in %s ", url));
+    } catch (Exception e) {
       logger.warn(String.format("User not found in %s ", url));
     }
 

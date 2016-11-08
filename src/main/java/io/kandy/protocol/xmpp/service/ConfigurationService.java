@@ -49,6 +49,12 @@ public class ConfigurationService {
   @Value("${xmpp.brocast.logout.url}")
   private String xmppBrocastLogoutUrl;
 
+  @Value("${im.service.label}")
+  private String imServiceLabel;
+
+  @Value("${register.service.label}")
+  private String registerServiceLabel;
+
   @Value("${xmpp.context.prefix}")
   private String xmppContextUrl;
 
@@ -174,6 +180,22 @@ public class ConfigurationService {
 
   public void setXmppServiceLabel(String xmppServiceLabel) {
     this.xmppServiceLabel = xmppServiceLabel;
+  }
+
+  public String getImServiceLabel() {
+    return imServiceLabel;
+  }
+
+  public void setImServiceLabel(String imServiceLabel) {
+    this.imServiceLabel = imServiceLabel;
+  }
+
+  public String getRegisterServiceLabel() {
+    return registerServiceLabel;
+  }
+
+  public void setRegisterServiceLabel(String registerServiceLabel) {
+    this.registerServiceLabel = registerServiceLabel;
   }
 
 }
