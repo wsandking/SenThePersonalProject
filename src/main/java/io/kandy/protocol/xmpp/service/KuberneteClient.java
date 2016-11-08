@@ -57,7 +57,9 @@ public class KuberneteClient {
      * Make message first
      */
     String messageId = null;
+    logger.info("Start brocast message + " + msg);
     IMMessage im = new IMMessage(to, msg);
+    
     for (String url : this.getMessageBrocastURLs(username)) {
       logger.info("Querying url: " + url);
       messageId = this.forwardPlainTextRequest(url, im);

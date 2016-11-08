@@ -62,16 +62,17 @@
 			<AppenderRef ref="App-File-Appender" />
 			<AppenderRef ref="Console-Appender" />
 		</Root>
-		<Logger name="io.kandy.protocol.xmpp.controller.XMPPController"
-			level="trace">
+		<Logger name="io.kandy.protocol.xmpp.controller" level="trace">
 			<AppenderRef ref="KAFKA" />
+			<AppenderRef ref="App-File-Appender" />
 			<AppenderRef ref="Console-Appender" />
 		</Logger>
 		<Logger name="io.kandy.protocol.xmpp.XMPPApplication" level="info">
 			<AppenderRef ref="KAFKA-START" />
 		</Logger>
 		<Logger name="io.kandy.protocol.xmpp.service.KuberneteClient"
-			level="info">
+			level="trace">
+			<AppenderRef ref="App-File-Appender" />
 			<AppenderRef ref="KAFKA" />
 		</Logger>
 		<Logger name="org.apache.kafka" level="info" />

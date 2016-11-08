@@ -183,7 +183,7 @@ public class XMPPSessionManager {
       /*
        * Brocast see if anyone on my subnet has it
        */
-
+      logger.info("Cannot find user try other system");
       messageId = kuberneteClient.brocastPlainMessage(username, to, msg);
       if (null == messageId)
         throw new Exception("Message deliver failure");
