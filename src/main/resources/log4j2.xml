@@ -75,6 +75,10 @@
 			<AppenderRef ref="App-File-Appender" />
 			<AppenderRef ref="KAFKA" />
 		</Logger>
+		<Logger name="io.kandy.protocol.xmpp.message.listener" level="trace">
+			<AppenderRef ref="App-File-Appender" />
+			<AppenderRef ref="KAFKA" />
+		</Logger>
 		<Logger name="org.apache.kafka" level="info" />
 	</Loggers>
 </Configuration>

@@ -5,11 +5,15 @@ import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
 public class GenericChatListener implements ChatMessageListener {
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private IMMessageClient client;
 
@@ -27,12 +31,14 @@ public class GenericChatListener implements ChatMessageListener {
   @Override
   public void processMessage(Chat chat, Message message) {
     // TODO Auto-generated method stub
-    System.out.println("Message type: " + message.getType());
-    System.out.println("Message received: " + message);
+
+    logger.trace("Message type: " + message.getType());
+    logger.trace("Message type: " + message.getType());
 
     try {
       // client = new IMMessageClient();
       if (null != message.getBody()) {
+        logger.info("Message: " + message.getBody());
         HttpStatus response = client.messageSendToIM(message);
         System.out.println("Message forwarded result : " + response.toString());
 

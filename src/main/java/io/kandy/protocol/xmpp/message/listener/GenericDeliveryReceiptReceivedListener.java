@@ -2,11 +2,15 @@ package io.kandy.protocol.xmpp.message.listener;
 
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 import io.kandy.protocol.xmpp.service.IMMessageClient;
 
 public class GenericDeliveryReceiptReceivedListener implements ReceiptReceivedListener {
+
+  private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
   private IMMessageClient client;
 
@@ -22,8 +26,10 @@ public class GenericDeliveryReceiptReceivedListener implements ReceiptReceivedLi
   public void onReceiptReceived(String fromJid, String toJid, String deliveryReceiptId,
       Stanza stanza) {
     // TODO Auto-generated method stub
-    System.out.println("onReceiptReceived: from: " + fromJid + " to: " + toJid
-        + " deliveryReceiptId: " + deliveryReceiptId + " stanza: " + stanza);
+
+    logger.info("onReceiptReceived: from: " + fromJid + " to: " + toJid + " deliveryReceiptId: "
+        + deliveryReceiptId + " stanza: " + stanza);
+
     // client = new IMMessageClient();
     IMMessageReceipt receipt = new IMMessageReceipt();
 
