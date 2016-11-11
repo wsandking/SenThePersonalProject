@@ -138,6 +138,12 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast</artifactId>
+			<version>3.7.2</version><!--$NO-MVN-MAN-VER$ -->
+		</dependency>
+		<dependency>
+			<groupId>com.hazelcast</groupId>
+			<artifactId>hazelcast-client</artifactId>
+			<version>3.7.2</version>
 		</dependency>
 		<!-- Spring swagger 2 -->
 		<dependency>
@@ -177,7 +183,17 @@
 			<artifactId>kubernetes-client</artifactId>
 			<version>1.4.17</version>
 		</dependency>
-
+		<!-- Java Melody -->
+		<dependency>
+			<groupId>net.bull.javamelody</groupId>
+			<artifactId>javamelody-core</artifactId>
+			<version>1.54.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jrobin</groupId>
+			<artifactId>jrobin</artifactId>
+			<version>1.5.9</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
