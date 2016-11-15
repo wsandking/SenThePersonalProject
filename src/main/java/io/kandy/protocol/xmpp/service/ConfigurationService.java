@@ -1,12 +1,40 @@
 package io.kandy.protocol.xmpp.service;
 
+
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @Scope("singleton")
 public class ConfigurationService {
+
+  public static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
+
+  @PostConstruct
+  public void initIn() {
+    /*
+     * Initialize the connection pool, at this point, initial XMPP Connection
+     */
+    /**
+     * Read Environment variables
+     */
+    Map<String, String> env = System.getenv();
+    for (String envName : env.keySet()) {
+      System.out.format("%s=%s%n", envName, env.get(envName));
+    }
+
+
+  }
+
+
   @Value("${xmpp.service}")
   private String defaultHostIp;
 
