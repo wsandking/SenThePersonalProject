@@ -48,7 +48,6 @@ public class KuberneteClient {
 
   @PostConstruct
   public void initIn() {
-
     /*
      * Initialize the the connection to kuberMaster
      */
@@ -58,75 +57,13 @@ public class KuberneteClient {
     localIp = this.instanceInfoStamp().get(1);
   }
 
-  public String brocastPlainMessage(String username, String to, String msg) {
-    /*
-     * Make message first
-     */
-    String messageId = null;
-    logger.info("Start brocast message:  " + msg);
-    IMMessage im = new IMMessage(to, msg);
+  public String discoverServiceURL(String labelKey, String labelValue) {
+    String hostIp = null;
 
-    for (String url : this.getMessageBrocastURLs(username)) {
-      logger.info("Querying url: " + url);
-      messageId = this.forwardPlainTextRequest(url, im);
-      if (null != messageId)
-        break;
-    }
-    logger.info("Message brocast finished!");
-    return messageId;
+
+    return hostIp;
   }
 
-  private List<String> getMessageBrocastURLs(String username) {
-    /*
-     * Get a properties for this later, maybe
-     */
-    String applicationPath = configurationService.getXmppContextUrl();
-    String messageBrocast = configurationService.getXmppBrocastMessageUrl();
-
-    return this.makeURLs(applicationPath, username, messageBrocast);
-
-  }
-
-  private List<String> makeURLs(String applicationPath, String username, String brocastPath) {
-    List<String> urls = new ArrayList<String>();
-    int servicePort = Integer.parseInt(configurationService.getXmppServicePort());
-    logger.info("Start making URLs");
-    for (Endpoints endpoint : client.endpoints()
-        .withLabel("name", configurationService.getXmppServiceLabel()).list().getItems()) {
-      logger.info("Start making URLs");
-      for (EndpointSubset subset : endpoint.getSubsets()) {
-        for (EndpointAddress address : subset.getAddresses()) {
-          if (!address.getIp().equals(this.localIp))
-            urls.add(String.format("http://%s:%d%s%s%s", address.getIp(), servicePort,
-                applicationPath, username, brocastPath));
-          else
-            logger.info("Self IP Address");
-        }
-      }
-    }
-    return urls;
-  }
-
-  public String forwardPlainTextRequest(String url, IMMessage im) {
-    String messageId = null;
-
-    RestTemplate client = new RestTemplate();
-    HttpHeaders headers = new HttpHeaders();
-    headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM_XML));
-    HttpEntity<IMMessage> entity = new HttpEntity<IMMessage>(im, headers);
-
-    try {
-      ResponseEntity<String> response = client.exchange(url, HttpMethod.POST, entity, String.class);
-      if (HttpStatus.NOT_FOUND != response.getStatusCode())
-        messageId = response.getBody();
-    } catch (HttpServerErrorException e) {
-      logger.warn(String.format("System error in %s ", url));
-    } catch (Exception e) {
-      logger.warn(String.format("User not found in %s ", url));
-    }
-
-    return messageId;
-  }
 
   /**
    * A hack, should be removed soon

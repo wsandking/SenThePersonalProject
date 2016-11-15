@@ -14,7 +14,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
-		<docker.image.prefix>wsandking</docker.image.prefix>
+		<docker.image.prefix>privateusagehub</docker.image.prefix>
 	</properties>
 
 	<build>

@@ -59,8 +59,11 @@ public class XMPPSessionManager {
   @Autowired
   private ConfigurationService configurationService;
 
-  @Autowired
-  private KuberneteClient kuberneteClient;
+  /**
+   * Probably be use in the future to discover
+   * 
+   * @Autowired private KuberneteClient kuberneteClient;
+   */
 
   @Autowired
   private SmackListener listener;
@@ -183,10 +186,10 @@ public class XMPPSessionManager {
       /*
        * Brocast see if anyone on my subnet has it
        */
-      logger.info("Cannot find user try other system");
-      messageId = kuberneteClient.brocastPlainMessage(username, to, msg);
-      if (null == messageId)
-        throw new Exception("Message deliver failure");
+      // logger.info("Cannot find user try other system");
+      // messageId = kuberneteClient.brocastPlainMessage(username, to, msg);
+      // if (null == messageId)
+      throw new Exception("Message deliver failure");
     }
     return messageId;
   }

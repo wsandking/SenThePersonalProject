@@ -24,7 +24,7 @@ public class ConfigurationService {
      * Initialize the connection pool, at this point, initial XMPP Connection
      */
     /**
-     * Read Environment variables
+     * Read Environment variables, read service type label,
      */
     Map<String, String> env = System.getenv();
     for (String envName : env.keySet()) {
@@ -62,29 +62,28 @@ public class ConfigurationService {
   @Value("${im.server.domain.name}")
   private String domainName;
 
-  @Value("${xmpp.services.label}")
-  private String xmppServiceLabel;
-
-  @Value("${xmpp.container.services.port}")
-  private String xmppServicePort;
+//  @Value("${xmpp.services.label}")
+//  private String xmppServiceLabel;
+//  @Value("${xmpp.container.services.port}")
+//  private String xmppServicePort;
 
   @Value("${kubernetes.master.url}")
   private String kubernetesMasterUrl;
 
-  @Value("${xmpp.brocast.message.url}")
-  private String xmppBrocastMessageUrl;
-
-  @Value("${xmpp.brocast.logout.url}")
-  private String xmppBrocastLogoutUrl;
-
-  @Value("${im.service.label}")
-  private String imServiceLabel;
-
-  @Value("${register.service.label}")
-  private String registerServiceLabel;
-
-  @Value("${xmpp.context.prefix}")
-  private String xmppContextUrl;
+//  @Value("${xmpp.brocast.message.url}")
+//  private String xmppBrocastMessageUrl;
+//
+//  @Value("${xmpp.brocast.logout.url}")
+//  private String xmppBrocastLogoutUrl;
+//
+//  @Value("${im.service.label}")
+//  private String imServiceLabel;
+//
+//  @Value("${register.service.label}")
+//  private String registerServiceLabel;
+//
+//  @Value("${xmpp.context.prefix}")
+//  private String xmppContextUrl;
 
   public String getDomainName() {
     return domainName;
@@ -158,22 +157,6 @@ public class ConfigurationService {
     this.impath = impath;
   }
 
-  public String getXmppServiceLabel() {
-    return xmppServiceLabel;
-  }
-
-  public void setXmppServiceName(String xmppServiceName) {
-    this.xmppServiceLabel = xmppServiceName;
-  }
-
-  public String getXmppServicePort() {
-    return xmppServicePort;
-  }
-
-  public void setXmppServicePort(String xmppServicePort) {
-    this.xmppServicePort = xmppServicePort;
-  }
-
   public String getKubernetesMasterUrl() {
     return kubernetesMasterUrl;
   }
@@ -182,48 +165,6 @@ public class ConfigurationService {
     this.kubernetesMasterUrl = kubernetesMasterUrl;
   }
 
-  public String getXmppBrocastMessageUrl() {
-    return xmppBrocastMessageUrl;
-  }
-
-  public void setXmppBrocastMessageUrl(String xmppBrocastMessageUrl) {
-    this.xmppBrocastMessageUrl = xmppBrocastMessageUrl;
-  }
-
-  public String getXmppBrocastLogoutUrl() {
-    return xmppBrocastLogoutUrl;
-  }
-
-  public void setXmppBrocastLogoutUrl(String xmppBrocastLogoutUrl) {
-    this.xmppBrocastLogoutUrl = xmppBrocastLogoutUrl;
-  }
-
-  public String getXmppContextUrl() {
-    return xmppContextUrl;
-  }
-
-  public void setXmppContextUrl(String xmppContextUrl) {
-    this.xmppContextUrl = xmppContextUrl;
-  }
-
-  public void setXmppServiceLabel(String xmppServiceLabel) {
-    this.xmppServiceLabel = xmppServiceLabel;
-  }
-
-  public String getImServiceLabel() {
-    return imServiceLabel;
-  }
-
-  public void setImServiceLabel(String imServiceLabel) {
-    this.imServiceLabel = imServiceLabel;
-  }
-
-  public String getRegisterServiceLabel() {
-    return registerServiceLabel;
-  }
-
-  public void setRegisterServiceLabel(String registerServiceLabel) {
-    this.registerServiceLabel = registerServiceLabel;
-  }
+ 
 
 }
