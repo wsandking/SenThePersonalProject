@@ -26,15 +26,30 @@ import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 public class IMMessageClient {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private String imRoutingServicesUrl = null;
+
 
   @Autowired
   private ConfigurationService configurationService;
 
-  public HttpStatus messageSendToIM(Message message) {
+  public HttpStatus messageSendToIM(Message message) throws Exception {
+
+    /**
+     * Check if im routing host is visible
+     */
+    if (null == imRoutingServicesUrl) {
+      
+      /**
+       * Try to let kuberneteClient to discover
+       */
+      
+      
+      logger.error("Cannot find address to connect to IM");
+      throw new Exception("Cannot find address to connect to IM");
+    }
+
     RestTemplate client = new RestTemplate();
-
     String receiver = this.makeUsername(message.getTo());
-
     IMMessage im = new IMMessage(receiver, message.getBody());
 
     HttpStatus ack = HttpStatus.NO_CONTENT;
@@ -56,9 +71,8 @@ public class IMMessageClient {
     // configurationService.getPort(), configurationService.getImpath(),
     // sender + "/app/xmpp/im/receive");
 
-    String url = String.format("http://%s:%d%s/%s", configurationService.getImhost(),
-        configurationService.getPort(), configurationService.getImpath(),
-        sender + "/app/xmpp/im/send");
+    String url = String.format("http://%s%s/%s", this.imRoutingServicesUrl,
+        configurationService.getImpath(), sender + "/app/xmpp/im/send");
     logger.info("Message forwarded to service url: " + url);
     System.out.println("**************Message forwarded to service url: " + url);
     /*
@@ -129,8 +143,10 @@ public class IMMessageClient {
     /*
      * Waiting for message delivered API finished
      */
-    String url = String.format("http://%s:%d/%s%s", "127.0.0.1", configurationService.getPort(),
-        configurationService.getImpath(), "/app/xmpp/im/deliver");
+    String url = String.format("http://%s%s%s", "127.0.0.1:8080", configurationService.getImpath(),
+        "/app/xmpp/im/deliver");
+    logger.info(String.format("http://%s%s%s", "127.0.0.1:8080", configurationService.getImpath(),
+        "/app/xmpp/im/deliver"));
     System.out.println("Message forwarded to service url: " + url);
     ResponseEntity<IMMessageDeliveredAck> response =
         client.postForEntity(url, entity, IMMessageDeliveredAck.class);

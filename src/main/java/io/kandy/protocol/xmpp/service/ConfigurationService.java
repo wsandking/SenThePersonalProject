@@ -28,10 +28,9 @@ public class ConfigurationService {
      */
     Map<String, String> env = System.getenv();
     for (String envName : env.keySet()) {
-      System.out.format("%s=%s%n", envName, env.get(envName));
+      logger.info(String.format("%s=%s%n", envName, env.get(envName)));
+
     }
-
-
   }
 
 
@@ -50,40 +49,14 @@ public class ConfigurationService {
   @Value("${xmpp.deliver.receipt.enable}")
   private boolean defaultEnableMessageDeliverReceipt;
 
-  @Value("${im.server.address}")
-  private String imhost;
-
-  @Value("${im.server.port}")
-  private int port;
-
   @Value("${im.server.path}")
   private String impath;
 
   @Value("${im.server.domain.name}")
   private String domainName;
 
-//  @Value("${xmpp.services.label}")
-//  private String xmppServiceLabel;
-//  @Value("${xmpp.container.services.port}")
-//  private String xmppServicePort;
-
   @Value("${kubernetes.master.url}")
   private String kubernetesMasterUrl;
-
-//  @Value("${xmpp.brocast.message.url}")
-//  private String xmppBrocastMessageUrl;
-//
-//  @Value("${xmpp.brocast.logout.url}")
-//  private String xmppBrocastLogoutUrl;
-//
-//  @Value("${im.service.label}")
-//  private String imServiceLabel;
-//
-//  @Value("${register.service.label}")
-//  private String registerServiceLabel;
-//
-//  @Value("${xmpp.context.prefix}")
-//  private String xmppContextUrl;
 
   public String getDomainName() {
     return domainName;
@@ -133,22 +106,6 @@ public class ConfigurationService {
     this.xmppDomain = xmppDomain;
   }
 
-  public String getImhost() {
-    return imhost;
-  }
-
-  public void setImhost(String imhost) {
-    this.imhost = imhost;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public void setPort(int port) {
-    this.port = port;
-  }
-
   public String getImpath() {
     return impath;
   }
@@ -164,7 +121,5 @@ public class ConfigurationService {
   public void setKubernetesMasterUrl(String kubernetesMasterUrl) {
     this.kubernetesMasterUrl = kubernetesMasterUrl;
   }
-
- 
 
 }

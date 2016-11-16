@@ -1,13 +1,7 @@
 package io.kandy.protocol.xmpp.service;
 
-
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+ 
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -33,6 +27,7 @@ import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.kandy.protocol.xmpp.model.IMMessage;
+import io.kandy.protocol.xmpp.model.ServicesType;
 
 @Service
 @Scope("singleton")
@@ -40,7 +35,7 @@ public class KuberneteClient {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private KubernetesClient client;
-  private String localIp;
+  private Map<String, String> imRoutingLabels;
 
 
   @Autowired
@@ -54,42 +49,27 @@ public class KuberneteClient {
     Config config =
         new ConfigBuilder().withMasterUrl(configurationService.getKubernetesMasterUrl()).build();
     client = new DefaultKubernetesClient(config);
-    localIp = this.instanceInfoStamp().get(1);
+    loadLabels();
+    logger.info("Kubernetes Client Initialization finished");
+
   }
 
-  public String discoverServiceURL(String labelKey, String labelValue) {
-    String hostIp = null;
-
-
-    return hostIp;
+  private void loadLabels() {
+    
   }
 
+  public String discoverServiceURL(ServicesType service) throws Exception {
+    String destionationUrl = null;
 
-  /**
-   * A hack, should be removed soon
-   * 
-   * @return
-   */
-  private List<String> instanceInfoStamp() {
-
-    ArrayList<String> ips = new ArrayList<String>();
-    Enumeration<NetworkInterface> e;
-    try {
-      e = NetworkInterface.getNetworkInterfaces();
-      while (e.hasMoreElements()) {
-        NetworkInterface n = (NetworkInterface) e.nextElement();
-        Enumeration<InetAddress> ee = n.getInetAddresses();
-        while (ee.hasMoreElements()) {
-          InetAddress i = (InetAddress) ee.nextElement();
-          ips.add(i.getHostAddress());
-        }
-      }
-
-    } catch (SocketException e1) {
-      // TODO Auto-generated catch block
-      logger.info("Cannot read IP address");
-      e1.printStackTrace();
+    switch (service) {
+      case imRoutingServices:
+        logger.info("Try to discover im");
+        client.services().withLabels(this.imRoutingLabels);
+        break;
+      default:
+        throw new Exception("Unknown services type: " + service);
     }
-    return ips;
+    return destionationUrl;
   }
+
 }

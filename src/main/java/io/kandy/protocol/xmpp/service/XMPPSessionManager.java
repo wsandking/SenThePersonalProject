@@ -334,9 +334,9 @@ public class XMPPSessionManager {
     // System.out.println(String.format("Host: %s : port: %d",
     // defaultHostIp, defaultPort));
     logger.info(String.format("Host: %s : port: %d", configurationService.getDefaultHostIp(),
-        configurationService.getPort()));
+        configurationService.getDefaultPort()));
     System.out.println(String.format("Host: %s : port: %d", configurationService.getDefaultHostIp(),
-        configurationService.getPort()));
+        configurationService.getDefaultPort()));
 
     Builder builder;
     builder = XMPPTCPConnectionConfiguration.builder();
@@ -351,6 +351,12 @@ public class XMPPSessionManager {
     return builder.build();
   }
 
+  /**
+   * For making username purpose
+   * 
+   * @param xmppId
+   * @return
+   */
   private String retriveUsername(String xmppId) {
 
     if (xmppId.contains("@")) {
@@ -363,7 +369,12 @@ public class XMPPSessionManager {
   }
 
 
-
+  /**
+   * For
+   * 
+   * @param to
+   * @return
+   */
   private String makeToUrl(String to) {
 
     if (to.contains("@")) {
