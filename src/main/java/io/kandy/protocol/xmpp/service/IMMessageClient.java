@@ -37,20 +37,22 @@ public class IMMessageClient {
     /**
      * Read Environment variables, read service type label,
      */
+    String ip = null;
+    int port = 0;
     Map<String, String> env = System.getenv();
     for (String envName : env.keySet()) {
       logger.info(String.format("%s=%s%n", envName, env.get(envName)));
-      String ip = null;
-      int port = 0;
+
       if ("IM_ROUTING_MANAGER_SERVICE_HOST".equals(envName)) {
         ip = env.get(envName);
       }
       if ("IM_ROUTING_MANAGER_SERVICE_PORT".equals(envName)) {
         port = Integer.parseInt(env.get(envName));
       }
-      imRoutingServicesUrl = ip + ":" + port;
-      logger.info("imRoutingServicesUrl : " + imRoutingServicesUrl);
+
     }
+    imRoutingServicesUrl = ip + ":" + port;
+    logger.info("imRoutingServicesUrl : " + imRoutingServicesUrl);
   }
 
 
