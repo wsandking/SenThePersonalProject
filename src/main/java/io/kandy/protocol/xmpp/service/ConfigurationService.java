@@ -1,9 +1,6 @@
 package io.kandy.protocol.xmpp.service;
 
 
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,22 +14,6 @@ import org.springframework.stereotype.Service;
 public class ConfigurationService {
 
   public static final Logger logger = LoggerFactory.getLogger(ConfigurationService.class);
-
-  @PostConstruct
-  public void initIn() {
-    /*
-     * Initialize the connection pool, at this point, initial XMPP Connection
-     */
-    /**
-     * Read Environment variables, read service type label,
-     */
-    Map<String, String> env = System.getenv();
-    for (String envName : env.keySet()) {
-      logger.info(String.format("%s=%s%n", envName, env.get(envName)));
-
-    }
-  }
-
 
   @Value("${xmpp.service}")
   private String defaultHostIp;

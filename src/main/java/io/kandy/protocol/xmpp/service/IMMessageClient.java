@@ -1,6 +1,9 @@
 package io.kandy.protocol.xmpp.service;
 
 import java.util.Arrays;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import org.jivesoftware.smack.packet.Message;
 import org.slf4j.Logger;
@@ -25,6 +28,32 @@ import io.kandy.protocol.xmpp.model.IMMessageReceipt;
 @Scope("singleton")
 public class IMMessageClient {
 
+
+  @PostConstruct
+  public void initIn() {
+    /*
+     * Initialize the connection pool, at this point, initial XMPP Connection
+     */
+    /**
+     * Read Environment variables, read service type label,
+     */
+    Map<String, String> env = System.getenv();
+    for (String envName : env.keySet()) {
+      logger.info(String.format("%s=%s%n", envName, env.get(envName)));
+      String ip = null;
+      int port = 0;
+      if ("IM_ROUTING_MANAGER_SERVICE_HOST".equals(envName)) {
+        ip = env.get(envName);
+      }
+      if ("IM_ROUTING_MANAGER_SERVICE_PORT".equals(envName)) {
+        port = Integer.parseInt(env.get(envName));
+      }
+      imRoutingServicesUrl = ip + ":" + port;
+      logger.info("imRoutingServicesUrl : " + imRoutingServicesUrl);
+    }
+  }
+
+
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private String imRoutingServicesUrl = null;
 
@@ -38,12 +67,9 @@ public class IMMessageClient {
      * Check if im routing host is visible
      */
     if (null == imRoutingServicesUrl) {
-      
       /**
        * Try to let kuberneteClient to discover
        */
-      
-      
       logger.error("Cannot find address to connect to IM");
       throw new Exception("Cannot find address to connect to IM");
     }
