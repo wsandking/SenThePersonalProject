@@ -2,11 +2,9 @@
 <Configuration monitorInterval="60">
 	<Properties>
 		<Property name="log-path">applogs</Property>
-		 
 		<Property name="kafka.brokers">172.28.247.237:9092</Property>
 		<Property name="kafka.start.topic">ms-start-log</Property>
 		<Property name="kafka.event.topic">mslog</Property>
-		 
 		<Property name="microserver.name.id">ms.xmppconn.1</Property>
 	</Properties>
 
@@ -33,7 +31,7 @@
 				</pattern>
 			</PatternLayout>
 		</File>
-		
+		<!--  
 		<Kafka name="KAFKA" topic="${kafka.event.topic}">
 			<ThresholdFilter level="ALL" onMatch="ACCEPT"
 				onMismatch="DENY" />
@@ -49,7 +47,7 @@
 				pattern=" ${microserver.name.id} %d{yyyy-MM-dd HH:mm:ss,SSS}: %m" />
 			<Property name="bootstrap.servers">${kafka.brokers}</Property>
 		</Kafka>
-       
+        -->
 	</Appenders>
 	<Loggers>
 		<Logger name="org.springframework.web" level="info" additivity="false">
@@ -65,7 +63,7 @@
 			<AppenderRef ref="App-File-Appender" />
 			<AppenderRef ref="Console-Appender" />
 		</Root>
-		 
+		<!--
 		<Logger name="io.kandy.protocol.xmpp.controller" level="trace">
 			<AppenderRef ref="KAFKA" />
 			<AppenderRef ref="App-File-Appender" />
@@ -85,6 +83,6 @@
 			<AppenderRef ref="KAFKA" />
 		</Logger>
 		<Logger name="org.apache.kafka" level="info" />
-		
+		-->
 	</Loggers>
 </Configuration>
